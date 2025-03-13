@@ -59,7 +59,7 @@ func InetAton(ipStr string) int64 {
 	return sum
 }
 
-//int64 to IP
+// int64 to IP
 func InetNtoa(ipnr int64) net.IP {
 	var bytes [4]byte
 	bytes[0] = byte(ipnr & 0xFF)

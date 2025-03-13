@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package app mqant默认应用实现
+// Package app mqant 默认应用实现
 package app
 
 import (
@@ -20,7 +20,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	basegate "github.com/liangdas/mqant/gate/base"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -31,6 +30,7 @@ import (
 	"time"
 
 	"github.com/liangdas/mqant/conf"
+	basegate "github.com/liangdas/mqant/gate/base"
 	"github.com/liangdas/mqant/log"
 	"github.com/liangdas/mqant/module"
 	basemodule "github.com/liangdas/mqant/module/base"

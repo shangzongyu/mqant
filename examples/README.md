@@ -1,4 +1,4 @@
-# mqant 使用demo
+# mqant 使用 demo
 
 # 自动生成代码介绍
 
@@ -126,7 +126,7 @@ func (proxy *ClientProxyService) Stream(req *greeter.Request) (rsp *Response, er
 	})
 	return rsp, err
 }
- 
+
 ```
 
 在mqant 初始化函数里调用RegisterGreeterTcpHandler方法可以注册协议，同时如果想调用rpc协议。创建NewLoginClient代理类调用相应的rpc即可

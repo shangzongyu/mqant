@@ -92,15 +92,16 @@ func NewFileWriter() Logger {
 
 // Init file logger with json config.
 // jsonConfig like:
-//	{
-//	"filename":"logs/beego.log",
-//	"maxLines":10000,
-//	"maxsize":1024,
-//	"daily":true,
-//	"maxDays":15,
-//	"rotate":true,
-//  	"perm":"0600"
-//	}
+//
+//		{
+//		"filename":"logs/beego.log",
+//		"maxLines":10000,
+//		"maxsize":1024,
+//		"daily":true,
+//		"maxDays":15,
+//		"rotate":true,
+//	 	"perm":"0600"
+//		}
 func (w *fileLogWriter) Init(jsonConfig string) error {
 	err := json.Unmarshal([]byte(jsonConfig), w)
 	if err != nil {

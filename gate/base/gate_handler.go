@@ -18,12 +18,12 @@ package basegate
 import (
 	"fmt"
 	"runtime"
+	"strings"
+	"sync"
 
 	"github.com/liangdas/mqant/gate"
 	"github.com/liangdas/mqant/log"
 	"github.com/pkg/errors"
-	"strings"
-	"sync"
 )
 
 type handler struct {
@@ -43,7 +43,7 @@ func NewGateHandler(gate gate.Gate) *handler {
 	return handler
 }
 
-//当连接建立  并且MQTT协议握手成功
+// 当连接建立  并且MQTT协议握手成功
 func (h *handler) Connect(a gate.Agent) {
 	defer func() {
 		if err := recover(); err != nil {
@@ -68,7 +68,7 @@ func (h *handler) Connect(a gate.Agent) {
 	}
 }
 
-//当连接关闭	或者客户端主动发送MQTT DisConnect命令
+// 当连接关闭	或者客户端主动发送MQTT DisConnect命令
 func (h *handler) DisConnect(a gate.Agent) {
 	defer func() {
 		if err := recover(); err != nil {

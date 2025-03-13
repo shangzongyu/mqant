@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//      http://www.apache.org/licenses/LICENSE-2.0
+//	http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -53,7 +53,7 @@ func (this *AesEncrypt) getKey() []byte {
 	return arrKey[:16]
 }
 
-//加密字符串
+// 加密字符串
 func (this *AesEncrypt) Encrypt(strMesg string) ([]byte, error) {
 	key := this.getKey()
 	var iv = []byte(key)[:aes.BlockSize]
@@ -67,7 +67,7 @@ func (this *AesEncrypt) Encrypt(strMesg string) ([]byte, error) {
 	return encrypted, nil
 }
 
-//解密字符串
+// Decrypt 解密字符串
 func (this *AesEncrypt) Decrypt(src []byte) (strDesc string, err error) {
 	defer func() {
 		//错误处理

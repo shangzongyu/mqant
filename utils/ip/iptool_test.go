@@ -1,8 +1,9 @@
 package iptool
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestIsInnerIp(t *testing.T) {

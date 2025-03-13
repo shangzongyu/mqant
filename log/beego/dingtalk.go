@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/json-iterator/go"
 	"net/http"
 	"time"
+
+	jsoniter "github.com/json-iterator/go"
 )
 
 // SLACKWriter implements beego LoggerInterface and is used to send jiaoliao webhook

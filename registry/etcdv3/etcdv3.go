@@ -11,10 +11,9 @@ import (
 	"sync"
 	"time"
 
-	"go.etcd.io/etcd/clientv3"
-
 	"github.com/liangdas/mqant/registry"
 	hash "github.com/mitchellh/hashstructure"
+	"go.etcd.io/etcd/clientv3"
 	"go.etcd.io/etcd/etcdserver/api/v3rpc/rpctypes"
 )
 

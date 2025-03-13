@@ -22,7 +22,7 @@ import (
 	logs "github.com/liangdas/mqant/log/beego"
 )
 
-//NewBeegoLogger beego
+// NewBeegoLogger beego
 func NewBeegoLogger(debug bool, ProcessID string, Logdir string, settings map[string]interface{}, logFilePath func(logdir, prefix, processID, suffix string) string) *logs.BeeLogger {
 	log := logs.NewLogger()
 	log.ProcessID = ProcessID

@@ -17,6 +17,7 @@ package basemodule
 
 import (
 	"fmt"
+
 	"github.com/liangdas/mqant/conf"
 	"github.com/liangdas/mqant/log"
 	"github.com/liangdas/mqant/module"

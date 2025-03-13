@@ -2,10 +2,11 @@ package logs
 
 import (
 	"fmt"
-	"github.com/json-iterator/go"
 	"net/http"
 	"net/url"
 	"time"
+
+	jsoniter "github.com/json-iterator/go"
 )
 
 // JLWriter implements beego LoggerInterface and is used to send jiaoliao webhook
