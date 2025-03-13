@@ -31,3 +31,5 @@ server.conf.bat
 
 src/hitball
 .history
+
+.DS_Store
