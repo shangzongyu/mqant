@@ -19,31 +19,32 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
-	"github.com/liangdas/mqant/log"
 	"io"
+
+	"github.com/liangdas/mqant/log"
 )
 
 const (
 	Rserved = iota
-	CONNECT  //1
-	CONNACK  //2
+	CONNECT //1
+	CONNACK //2
 
-	PUBLISH  //3
-	PUBACK   //4
-	PUBREC   //5
-	PUBREL   //6
-	PUBCOMP  //7
+	PUBLISH //3
+	PUBACK  //4
+	PUBREC  //5
+	PUBREL  //6
+	PUBCOMP //7
 
-	SUBSCRIBE  //8
-	SUBACK     //9
+	SUBSCRIBE //8
+	SUBACK    //9
 
-	UNSUBSCRIBE  //10
-	UNSUBACK     //11
+	UNSUBSCRIBE //10
+	UNSUBACK    //11
 
-	PINGREQ   //12
-	PINGRESP  //13
+	PINGREQ  //12
+	PINGRESP //13
 
-	DISCONNECT  //14
+	DISCONNECT //14
 )
 
 var null_string = ""
@@ -171,18 +172,23 @@ type Publish struct {
 func (pub *Publish) GetTopic() *string {
 	return pub.topic_name
 }
+
 func (pub *Publish) SetTopic(topic *string) {
 	pub.topic_name = topic
 }
+
 func (pub *Publish) GetMid() int {
 	return pub.mid
 }
+
 func (pub *Publish) SetMid(id int) {
 	pub.mid = id
 }
+
 func (pub *Publish) GetMsg() []byte {
 	return pub.msg
 }
+
 func (pub *Publish) SetMsg(msg []byte) {
 	pub.msg = msg
 }
@@ -221,6 +227,7 @@ type Subscribe struct {
 func (sub *Subscribe) SetMid(id int) {
 	sub.mid = id
 }
+
 func (sub *Subscribe) GetMid() int {
 	return sub.mid
 }

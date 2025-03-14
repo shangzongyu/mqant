@@ -100,6 +100,7 @@ func (age *agent) Wait() error {
 	}
 	return nil
 }
+
 func (age *agent) Finish() {
 	// 完成则从ch推出数据
 	select {

@@ -35,12 +35,12 @@ type AesEncrypt struct {
 	StrKey string
 }
 
-func (this *AesEncrypt) getKey() []byte {
-	keyLen := len(this.StrKey)
+func (ae *AesEncrypt) getKey() []byte {
+	keyLen := len(ae.StrKey)
 	if keyLen < 16 {
 		panic("The length of res key shall not be less than 16")
 	}
-	arrKey := []byte(this.StrKey)
+	arrKey := []byte(ae.StrKey)
 	if keyLen >= 32 {
 		//取前32个字节
 		return arrKey[:32]
@@ -53,9 +53,9 @@ func (this *AesEncrypt) getKey() []byte {
 	return arrKey[:16]
 }
 
-// 加密字符串
-func (this *AesEncrypt) Encrypt(strMesg string) ([]byte, error) {
-	key := this.getKey()
+// Encrypt 加密字符串
+func (ae *AesEncrypt) Encrypt(strMesg string) ([]byte, error) {
+	key := ae.getKey()
 	var iv = []byte(key)[:aes.BlockSize]
 	encrypted := make([]byte, len(strMesg))
 	aesBlockEncrypter, err := aes.NewCipher(key)
@@ -68,14 +68,14 @@ func (this *AesEncrypt) Encrypt(strMesg string) ([]byte, error) {
 }
 
 // Decrypt 解密字符串
-func (this *AesEncrypt) Decrypt(src []byte) (strDesc string, err error) {
+func (ae *AesEncrypt) Decrypt(src []byte) (strDesc string, err error) {
 	defer func() {
-		//错误处理
+		// 错误处理
 		if e := recover(); e != nil {
 			err = e.(error)
 		}
 	}()
-	key := this.getKey()
+	key := ae.getKey()
 	var iv = []byte(key)[:aes.BlockSize]
 	decrypted := make([]byte, len(src))
 	var aesBlockDecrypter cipher.Block

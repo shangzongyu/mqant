@@ -40,7 +40,7 @@ func CheckIp(ipStr string) bool {
 	}
 }
 
-// ip to int64
+// InetAton ip to int64
 func InetAton(ipStr string) int64 {
 	bits := strings.Split(ipStr, ".")
 
@@ -59,7 +59,7 @@ func InetAton(ipStr string) int64 {
 	return sum
 }
 
-// int64 to IP
+// InetNtoa int64 to IP
 func InetNtoa(ipnr int64) net.IP {
 	var bytes [4]byte
 	bytes[0] = byte(ipnr & 0xFF)

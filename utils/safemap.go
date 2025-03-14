@@ -60,7 +60,7 @@ func (m *BeeMap) Set(k interface{}, v interface{}) bool {
 	return true
 }
 
-// Check Returns true if k is exist in the map.
+// Check Returns true if k is existed in the map.
 func (m *BeeMap) Check(k interface{}) bool {
 	m.lock.RLock()
 	if _, ok := m.bm[k]; !ok {
@@ -88,7 +88,7 @@ func (m *BeeMap) DeleteAll() {
 	m.lock.Unlock()
 }
 
-// Items returns all items in safemap.
+// Items returns all items in safe map.
 func (m *BeeMap) Items() map[interface{}]interface{} {
 	m.lock.RLock()
 	r := make(map[interface{}]interface{})

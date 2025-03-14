@@ -48,7 +48,8 @@ func (gt *Gate) SetJudgeGuest(judgeGuest func(session gate.Session) bool) error 
 	return nil
 }
 
-/**
+/*
+*
 设置Session信息持久化接口
 */
 func (gt *Gate) SetRouteHandler(router gate.RouteHandler) error {
@@ -56,7 +57,8 @@ func (gt *Gate) SetRouteHandler(router gate.RouteHandler) error {
 	return nil
 }
 
-/**
+/*
+*
 设置Session信息持久化接口
 */
 func (gt *Gate) SetStorageHandler(storage gate.StorageHandler) error {
@@ -64,7 +66,8 @@ func (gt *Gate) SetStorageHandler(storage gate.StorageHandler) error {
 	return nil
 }
 
-/**
+/*
+*
 设置客户端连接和断开的监听器
 */
 func (gt *Gate) SetSessionLearner(sessionLearner gate.SessionLearner) error {
@@ -72,7 +75,8 @@ func (gt *Gate) SetSessionLearner(sessionLearner gate.SessionLearner) error {
 	return nil
 }
 
-/**
+/*
+*
 设置创建客户端Agent的函数
 */
 func (gt *Gate) SetCreateAgent(cfunc func() gate.Agent) error {
@@ -107,17 +111,15 @@ func (gt *Gate) GetModule() module.RPCModule {
 func (gt *Gate) NewSession(data []byte) (gate.Session, error) {
 	return NewSession(gt.App, data)
 }
+
 func (gt *Gate) NewSessionByMap(data map[string]interface{}) (gate.Session, error) {
 	return NewSessionByMap(gt.App, data)
 }
 
 func (gt *Gate) OnConfChanged(settings *conf.ModuleSettings) {
-
 }
 
-/**
-自定义rpc参数序列化反序列化  Session
-*/
+// Serialize 自定义 rpc 参数序列化反序列化 Session
 func (gt *Gate) Serialize(param interface{}) (ptype string, p []byte, err error) {
 	rv := reflect.ValueOf(param)
 	if rv.Kind() != reflect.Ptr || rv.IsNil() {
@@ -162,9 +164,7 @@ type SessionSerialize struct {
 	App module.App
 }
 
-/**
-自定义rpc参数序列化反序列化  Session
-*/
+// Serialize 自定义rpc参数序列化反序列化 Session
 func (gt *SessionSerialize) Serialize(param interface{}) (ptype string, p []byte, err error) {
 	rv := reflect.ValueOf(param)
 	if rv.Kind() != reflect.Ptr || rv.IsNil() {
@@ -310,7 +310,9 @@ func (gt *Gate) Run(closeSig chan bool) {
 	if tcpServer != nil {
 		tcpServer.Start()
 	}
+
 	<-closeSig
+
 	if gt.opts.GateHandler != nil {
 		gt.opts.GateHandler.OnDestroy()
 	}
