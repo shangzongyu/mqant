@@ -13,10 +13,10 @@
 // limitations under the License.
 package defaultrpc
 
-import rpcpb "github.com/liangdas/mqant/rpc/pb"
+import rpcpb "github.com/shangzongyu/mqant/rpc/pb"
 
 type ClinetCallInfo struct {
 	correlation_id string
-	timeout        int64 //超时
+	timeout        int64 // 超时
 	call           chan *rpcpb.ResultInfo
 }

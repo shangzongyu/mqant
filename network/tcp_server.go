@@ -21,13 +21,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/liangdas/mqant/log"
+	"github.com/shangzongyu/mqant/log"
 )
 
 // TCPServer TCP 服务器
 type TCPServer struct {
 	Addr       string
-	TLS        bool //是否支持tls
+	TLS        bool // 是否支持tls
 	CertFile   string
 	KeyFile    string
 	MaxConnNum int
@@ -70,6 +70,7 @@ func (server *TCPServer) init() {
 
 	server.ln = ln
 }
+
 func (server *TCPServer) run() {
 	server.wgLn.Add(1)
 	defer server.wgLn.Done()

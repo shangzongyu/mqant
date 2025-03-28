@@ -19,7 +19,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	logs "github.com/liangdas/mqant/log/beego"
+	logs "github.com/shangzongyu/mqant/log/beego"
 )
 
 // NewBeegoLogger beego
@@ -27,10 +27,10 @@ func NewBeegoLogger(debug bool, ProcessID string, Logdir string, settings map[st
 	log := logs.NewLogger()
 	log.ProcessID = ProcessID
 	log.EnableFuncCallDepth(true)
-	//log.Async(1024) //同步打印,可能影响性能
+	// log.Async(1024) //同步打印,可能影响性能
 	log.SetLogFuncCallDepth(4)
 	if debug {
-		//控制台
+		// 控制台
 		log.SetLogger(logs.AdapterConsole)
 	}
 	if contenttype, ok := settings["contenttype"]; ok {

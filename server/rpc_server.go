@@ -1,16 +1,17 @@
 package server
 
 import (
-	"github.com/liangdas/mqant/conf"
-	"github.com/liangdas/mqant/log"
-	"github.com/liangdas/mqant/module"
-	"github.com/liangdas/mqant/registry"
-	"github.com/liangdas/mqant/rpc"
-	"github.com/liangdas/mqant/rpc/base"
-	"github.com/liangdas/mqant/utils/lib/addr"
 	"strconv"
 	"strings"
 	"sync"
+
+	"github.com/shangzongyu/mqant/conf"
+	"github.com/shangzongyu/mqant/log"
+	"github.com/shangzongyu/mqant/module"
+	"github.com/shangzongyu/mqant/registry"
+	"github.com/shangzongyu/mqant/rpc"
+	"github.com/shangzongyu/mqant/rpc/base"
+	"github.com/shangzongyu/mqant/utils/lib/addr"
 )
 
 type rpcServer struct {
@@ -53,7 +54,7 @@ func (s *rpcServer) Init(opts ...Option) error {
 }
 
 func (s *rpcServer) OnInit(module module.Module, app module.App, settings *conf.ModuleSettings) error {
-	server, err := defaultrpc.NewRPCServer(app, module) //默认会创建一个本地的RPC
+	server, err := defaultrpc.NewRPCServer(app, module) // 默认会创建一个本地的RPC
 	if err != nil {
 		log.Warning("Dial: %s", err)
 	}
@@ -64,9 +65,11 @@ func (s *rpcServer) OnInit(module module.Module, app module.App, settings *conf.
 	}
 	return nil
 }
+
 func (s *rpcServer) SetListener(listener mqrpc.RPCListener) {
 	s.server.SetListener(listener)
 }
+
 func (s *rpcServer) Register(id string, f interface{}) {
 	if s.server == nil {
 		panic("invalid RPCServer")
@@ -220,13 +223,13 @@ func (s *rpcServer) ServiceDeregister() error {
 }
 
 func (s *rpcServer) Start() error {
-	//config := s.Options()
+	// config := s.Options()
 
-	//s.Lock()
+	// s.Lock()
 	// swap address
-	//addr := s.opts.Address
-	//s.opts.Address = ts.Addr()
-	//s.Unlock()
+	// addr := s.opts.Address
+	// s.opts.Address = ts.Addr()
+	// s.Unlock()
 	return nil
 }
 

@@ -22,8 +22,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/liangdas/mqant/conf"
-	"github.com/liangdas/mqant/network"
+	"github.com/shangzongyu/mqant/conf"
+	"github.com/shangzongyu/mqant/network"
 )
 
 // Tcp write queue
@@ -117,7 +117,7 @@ func (queue *PackQueue) Flusher() {
 		}
 		queue.writelock.Unlock()
 	}
-	//log.Info("flusher_loop Groutine will esc.")
+	// log.Info("flusher_loop Groutine will esc.")
 }
 
 // Write a pack , and get the last error
@@ -195,8 +195,9 @@ loop:
 		p = new(packAndErr)
 	}
 
-	//log.Info("read_loop Groutine will esc.")
+	// log.Info("read_loop Groutine will esc.")
 }
+
 func (queue *PackQueue) CloseFch() {
 	defer func() {
 		if recover() != nil {
@@ -213,7 +214,7 @@ func (queue *PackQueue) Close(err error) error {
 	queue.CloseFch()
 	queue.status = CLOSED
 	if queue.conn != nil {
-		//再关闭一下,防止文件描述符发生泄漏
+		// 再关闭一下,防止文件描述符发生泄漏
 		queue.conn.Close()
 	}
 	return nil
@@ -231,6 +232,7 @@ func newBuffer(data []byte) *buffer {
 		index: 0,
 	}
 }
+
 func (b *buffer) readString(length int) (s string, err error) {
 	if (length + b.index) > len(b.data) {
 		err = fmt.Errorf("Out of range error:%v", length)
@@ -240,6 +242,7 @@ func (b *buffer) readString(length int) (s string, err error) {
 	b.index += length
 	return
 }
+
 func (b *buffer) readByte() (c byte, err error) {
 	if (1 + b.index) > len(b.data) {
 		err = fmt.Errorf("Out of range error")

@@ -15,11 +15,10 @@
 // Package log 日志结构定义
 package log
 
-import mqanttools "github.com/liangdas/mqant/utils"
+import mqanttools "github.com/shangzongyu/mqant/utils"
 
 // TraceSpan A SpanID refers to a single span.
 type TraceSpan interface {
-
 	// Trace is the root ID of the tree that contains all of the spans
 	// related to this one.
 	TraceId() string

@@ -21,17 +21,17 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/liangdas/mqant/gate"
-	"github.com/liangdas/mqant/log"
 	"github.com/pkg/errors"
+	"github.com/shangzongyu/mqant/gate"
+	"github.com/shangzongyu/mqant/log"
 )
 
 type handler struct {
-	//gate.AgentLearner
-	//gate.GateHandler
+	// gate.AgentLearner
+	// gate.GateHandler
 	lock     sync.RWMutex
 	gate     gate.Gate
-	sessions sync.Map //连接列表
+	sessions sync.Map // 连接列表
 	agentNum int
 }
 
@@ -54,7 +54,7 @@ func (h *handler) Connect(a gate.Agent) {
 	}()
 	if a.GetSession() != nil {
 		h.sessions.Store(a.GetSession().GetSessionID(), a)
-		//已经建联成功的才计算
+		// 已经建联成功的才计算
 		if a.ProtocolOK() {
 			h.lock.Lock()
 			h.agentNum++
@@ -78,7 +78,7 @@ func (h *handler) DisConnect(a gate.Agent) {
 		}
 		if a.GetSession() != nil {
 			h.sessions.Delete(a.GetSession().GetSessionID())
-			//已经建联成功的才计算
+			// 已经建联成功的才计算
 			if a.ProtocolOK() {
 				h.lock.Lock()
 				h.agentNum--
@@ -88,7 +88,7 @@ func (h *handler) DisConnect(a gate.Agent) {
 	}()
 	if h.gate.GetSessionLearner() != nil {
 		if a.GetSession() != nil {
-			//没有session的就不返回了
+			// 没有session的就不返回了
 			h.gate.GetSessionLearner().DisConnect(a.GetSession())
 		}
 	}
@@ -146,25 +146,25 @@ func (h *handler) Bind(span log.TraceSpan, Sessionid string, Userid string) (res
 	agent.(gate.Agent).GetSession().SetUserID(Userid)
 
 	if h.gate.GetStorageHandler() != nil && agent.(gate.Agent).GetSession().GetUserID() != "" {
-		//可以持久化
+		// 可以持久化
 		data, err := h.gate.GetStorageHandler().Query(Userid)
 		if err == nil && data != nil {
-			//有已持久化的数据,可能是上一次连接保存的
+			// 有已持久化的数据,可能是上一次连接保存的
 			impSession, err := h.gate.NewSession(data)
 			if err == nil {
 				if agent.(gate.Agent).GetSession() == nil {
 					agent.(gate.Agent).GetSession().SetSettings(impSession.CloneSettings())
 				} else {
-					//合并两个map 并且以 agent.(Agent).GetSession().Settings 已有的优先
+					// 合并两个map 并且以 agent.(Agent).GetSession().Settings 已有的优先
 					settings := impSession.CloneSettings()
 					_ = agent.(gate.Agent).GetSession().ImportSettings(settings)
 				}
 			} else {
-				//解析持久化数据失败
+				// 解析持久化数据失败
 				log.Warning("Sesssion Resolve fail %s", err.Error())
 			}
 		}
-		//数据持久化
+		// 数据持久化
 		_ = h.gate.GetStorageHandler().Storage(agent.(gate.Agent).GetSession())
 	}
 
@@ -215,7 +215,7 @@ func (h *handler) Push(span log.TraceSpan, Sessionid string, Settings map[string
 		err = "No Sesssion found"
 		return
 	}
-	//覆盖当前map对应的key-value
+	// 覆盖当前map对应的key-value
 	for key, value := range Settings {
 		_ = agent.(gate.Agent).GetSession().SetLocalKV(key, value)
 	}
@@ -312,6 +312,7 @@ func (h *handler) SendBatch(span log.TraceSpan, SessionidStr string, topic strin
 	}
 	return count, ""
 }
+
 func (h *handler) BroadCast(span log.TraceSpan, topic string, body []byte) (int64, string) {
 	var count int64 = 0
 	h.sessions.Range(func(key, agent interface{}) bool {

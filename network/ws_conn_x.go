@@ -21,7 +21,7 @@ import (
 	"sync"
 	"time"
 
-	iptool "github.com/liangdas/mqant/utils/ip"
+	iptool "github.com/shangzongyu/mqant/utils/ip"
 	"golang.org/x/net/websocket"
 )
 
@@ -36,8 +36,8 @@ func (addr *Addr) String() string  { return addr.ip }
 
 // WSConn websocket 连接
 type WSConn struct {
-	io.Reader //Read(p []byte) (n int, err error)
-	io.Writer //Write(p []byte) (n int, err error)
+	io.Reader // Read(p []byte) (n int, err error)
+	io.Writer // Write(p []byte) (n int, err error)
 	sync.Mutex
 	conn      *websocket.Conn
 	closeFlag bool
@@ -62,16 +62,16 @@ func (wsConn *WSConn) doDestroy() {
 
 // Destroy 注销连接
 func (wsConn *WSConn) Destroy() {
-	//wsConn.Lock()
-	//defer wsConn.Unlock()
+	// wsConn.Lock()
+	// defer wsConn.Unlock()
 
 	wsConn.doDestroy()
 }
 
 // Close 关闭连接
 func (wsConn *WSConn) Close() error {
-	//wsConn.Lock()
-	//defer wsConn.Unlock()
+	// wsConn.Lock()
+	// defer wsConn.Unlock()
 	if wsConn.closeFlag {
 		return nil
 	}

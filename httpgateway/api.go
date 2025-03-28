@@ -5,11 +5,11 @@ import (
 	"context"
 	"net/http"
 
-	httpgatewayapi "github.com/liangdas/mqant/httpgateway/api"
-	"github.com/liangdas/mqant/httpgateway/errors"
-	go_api "github.com/liangdas/mqant/httpgateway/proto"
-	"github.com/liangdas/mqant/module"
-	mqrpc "github.com/liangdas/mqant/rpc"
+	httpgatewayapi "github.com/shangzongyu/mqant/httpgateway/api"
+	"github.com/shangzongyu/mqant/httpgateway/errors"
+	go_api "github.com/shangzongyu/mqant/httpgateway/proto"
+	"github.com/shangzongyu/mqant/module"
+	mqrpc "github.com/shangzongyu/mqant/rpc"
 )
 
 // APIHandler 网关handler

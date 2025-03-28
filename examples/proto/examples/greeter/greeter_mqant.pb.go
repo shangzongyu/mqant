@@ -7,9 +7,9 @@ package greeter
 // is compatible with the kratos package it is being compiled against.
 import (
 	"errors"
-	basemodule "github.com/liangdas/mqant/module/base"
-	client "github.com/liangdas/mqant/module"
-	mqrpc "github.com/liangdas/mqant/rpc"
+	basemodule "github.com/shangzongyu/mqant/module/base"
+	client "github.com/shangzongyu/mqant/module"
+	mqrpc "github.com/shangzongyu/mqant/rpc"
 	"golang.org/x/net/context"
 )
 

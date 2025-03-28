@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"strings"
 
-	api "github.com/liangdas/mqant/httpgateway/proto"
+	api "github.com/shangzongyu/mqant/httpgateway/proto"
 )
 
 func RequestToProto(r *http.Request) (*api.Request, error) {
@@ -27,11 +27,11 @@ func RequestToProto(r *http.Request) (*api.Request, error) {
 
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		ct = "text/plain; charset=UTF-8" //default CT is text/plain
+		ct = "text/plain; charset=UTF-8" // default CT is text/plain
 		r.Header.Set("Content-Type", ct)
 	}
 
-	//set the body:
+	// set the body:
 	if r.Body != nil {
 		switch ct {
 		case "application/x-www-form-urlencoded":

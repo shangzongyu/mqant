@@ -24,14 +24,14 @@ import (
 	"sync"
 	"time"
 
-	"github.com/liangdas/mqant/conf"
-	"github.com/liangdas/mqant/gate"
-	"github.com/liangdas/mqant/gate/base/mqtt"
-	"github.com/liangdas/mqant/log"
-	"github.com/liangdas/mqant/module"
-	"github.com/liangdas/mqant/network"
-	argsutil "github.com/liangdas/mqant/rpc/util"
-	mqanttools "github.com/liangdas/mqant/utils"
+	"github.com/shangzongyu/mqant/conf"
+	"github.com/shangzongyu/mqant/gate"
+	"github.com/shangzongyu/mqant/gate/base/mqtt"
+	"github.com/shangzongyu/mqant/log"
+	"github.com/shangzongyu/mqant/module"
+	"github.com/shangzongyu/mqant/network"
+	argsutil "github.com/shangzongyu/mqant/rpc/util"
+	mqanttools "github.com/shangzongyu/mqant/utils"
 )
 
 //type resultInfo struct {
@@ -48,11 +48,11 @@ type agent struct {
 	w                            *bufio.Writer
 	gate                         gate.Gate
 	client                       *mqtt.Client
-	ch                           chan int //控制模块可同时开启的最大协程数
+	ch                           chan int // 控制模块可同时开启的最大协程数
 	isclose                      bool
 	protocol_ok                  bool
 	lock                         sync.Mutex
-	lastStorageHeartbeatDataTime time.Duration //上一次发送存储心跳时间
+	lastStorageHeartbeatDataTime time.Duration // 上一次发送存储心跳时间
 	revNum                       int64
 	sendNum                      int64
 	connTime                     time.Time
@@ -64,6 +64,7 @@ func NewMqttAgent(module module.RPCModule) *agent {
 	}
 	return a
 }
+
 func (age *agent) OnInit(gate gate.Gate, conn network.Conn) error {
 	age.ch = make(chan int, gate.Options().ConcurrentTasks)
 	age.conn = conn
@@ -77,6 +78,7 @@ func (age *agent) OnInit(gate gate.Gate, conn network.Conn) error {
 	age.lastStorageHeartbeatDataTime = time.Duration(time.Now().UnixNano())
 	return nil
 }
+
 func (age *agent) IsClosed() bool {
 	return age.isclose
 }
@@ -93,9 +95,9 @@ func (age *agent) Wait() error {
 	// 如果ch满了则会处于阻塞，从而达到限制最大协程的功能
 	select {
 	case age.ch <- 1:
-	//do nothing
+	// do nothing
 	default:
-		//warnning!
+		// warnning!
 		return fmt.Errorf("the work queue is full!")
 	}
 	return nil
@@ -117,7 +119,6 @@ func (age *agent) Run() (err error) {
 			log.Error("conn.serve() panic(%v)\n info:%s", err, string(buff))
 		}
 		age.Close()
-
 	}()
 	go func() {
 		defer func() {
@@ -130,14 +131,13 @@ func (age *agent) Run() (err error) {
 		select {
 		case <-time.After(age.gate.Options().OverTime):
 			if age.GetSession() == nil {
-				//超过一段时间还没有建立mqtt连接则直接关闭网络连接
+				// 超过一段时间还没有建立mqtt连接则直接关闭网络连接
 				age.Close()
 			}
-
 		}
 	}()
 
-	//握手协议
+	// 握手协议
 	var pack *mqtt.Pack
 	pack, err = mqtt.ReadPack(age.r, age.gate.Options().MaxPackSize)
 	if err != nil {
@@ -153,9 +153,9 @@ func (age *agent) Run() (err error) {
 		log.Error("It's not age mqtt connection package.")
 		return
 	}
-	//id := info.GetUserName()
-	//psw := info.GetPassword()
-	//log.Debug("Read login pack %s %s %s %s",*id,*psw,info.GetProtocol(),info.GetVersion())
+	// id := info.GetUserName()
+	// psw := info.GetPassword()
+	// log.Debug("Read login pack %s %s %s %s",*id,*psw,info.GetProtocol(),info.GetVersion())
 	c := mqtt.NewClient(conf.Conf.Mqtt, age, age.r, age.w, age.conn, conn.GetKeepAlive(), age.gate.Options().MaxPackSize)
 	age.client = c
 	addr := age.conn.RemoteAddr()
@@ -168,7 +168,7 @@ func (age *agent) Run() (err error) {
 	})
 	netConn, ok := age.conn.(*network.WSConn)
 	if ok {
-		//如果是websocket连接 提取 User-Agent
+		// 如果是websocket连接 提取 User-Agent
 		age.session.SetLocalKV("User-Agent", netConn.Conn().Request().Header.Get("User-Agent"))
 	}
 	if err != nil {
@@ -176,8 +176,8 @@ func (age *agent) Run() (err error) {
 		return
 	}
 	age.session.JudgeGuest(age.gate.GetJudgeGuest())
-	age.session.CreateTrace() //代码跟踪
-	//回复客户端 CONNECT
+	age.session.CreateTrace() // 代码跟踪
+	// 回复客户端 CONNECT
 	err = mqtt.WritePack(mqtt.GetConnAckPack(0), age.w)
 	if err != nil {
 		log.Error("ConnAckPack error %v", err.Error())
@@ -185,8 +185,8 @@ func (age *agent) Run() (err error) {
 	}
 	age.connTime = time.Now()
 	age.protocol_ok = true
-	age.gate.GetAgentLearner().Connect(age) //发送连接成功的事件
-	c.Listen_loop()                         //开始监听,直到连接中断
+	age.gate.GetAgentLearner().Connect(age) // 发送连接成功的事件
+	c.Listen_loop()                         // 开始监听,直到连接中断
 	return nil
 }
 
@@ -199,7 +199,7 @@ func (age *agent) OnClose() error {
 		}
 	}()
 	age.isclose = true
-	age.gate.GetAgentLearner().DisConnect(age) //发送连接断开的事件
+	age.gate.GetAgentLearner().DisConnect(age) // 发送连接断开的事件
 	return nil
 }
 
@@ -210,12 +210,15 @@ func (age *agent) GetError() error {
 func (age *agent) RevNum() int64 {
 	return age.revNum
 }
+
 func (age *agent) SendNum() int64 {
 	return age.sendNum
 }
+
 func (age *agent) ConnTime() time.Time {
 	return age.connTime
 }
+
 func (age *agent) OnRecover(pack *mqtt.Pack) {
 	err := age.Wait()
 	if err != nil {
@@ -246,7 +249,7 @@ func (age *agent) toResult(a *agent, Topic string, Result interface{}, Error str
 func (age *agent) recoverworker(pack *mqtt.Pack) {
 	defer func() {
 		age.lock.Lock()
-		interval := int64(age.lastStorageHeartbeatDataTime) + int64(age.gate.Options().Heartbeat) //单位纳秒
+		interval := int64(age.lastStorageHeartbeatDataTime) + int64(age.gate.Options().Heartbeat) // 单位纳秒
 		age.lock.Unlock()
 		if interval < time.Now().UnixNano() {
 			if age.gate.GetStorageHandler() != nil {
@@ -265,7 +268,7 @@ func (age *agent) recoverworker(pack *mqtt.Pack) {
 	}()
 
 	toResult := age.toResult
-	//路由服务
+	// 路由服务
 	switch pack.GetType() {
 	case mqtt.PUBLISH:
 		age.lock.Lock()
@@ -311,7 +314,7 @@ func (age *agent) recoverworker(pack *mqtt.Pack) {
 				return
 			}
 			if len(pub.GetMsg()) > 0 && pub.GetMsg()[0] == '{' && pub.GetMsg()[len(pub.GetMsg())-1] == '}' {
-				//尝试解析为json为map
+				// 尝试解析为json为map
 				var obj interface{} // var obj map[string]interface{}
 				err := json.Unmarshal(pub.GetMsg(), &obj)
 				if err != nil {
@@ -388,7 +391,7 @@ func (age *agent) WriteMsg(topic string, body []byte) error {
 
 func (age *agent) Close() {
 	go func() {
-		//关闭连接部分情况下会阻塞超时，因此放协程去处理
+		// 关闭连接部分情况下会阻塞超时，因此放协程去处理
 		if age.conn != nil {
 			age.conn.Close()
 		}

@@ -21,30 +21,30 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/liangdas/mqant/log"
+	"github.com/shangzongyu/mqant/log"
 )
 
 const (
 	Rserved = iota
-	CONNECT //1
-	CONNACK //2
+	CONNECT // 1
+	CONNACK // 2
 
-	PUBLISH //3
-	PUBACK  //4
-	PUBREC  //5
-	PUBREL  //6
-	PUBCOMP //7
+	PUBLISH // 3
+	PUBACK  // 4
+	PUBREC  // 5
+	PUBREL  // 6
+	PUBCOMP // 7
 
-	SUBSCRIBE //8
-	SUBACK    //9
+	SUBSCRIBE // 8
+	SUBACK    // 9
 
-	UNSUBSCRIBE //10
-	UNSUBACK    //11
+	UNSUBSCRIBE // 10
+	UNSUBACK    // 11
 
-	PINGREQ  //12
-	PINGRESP //13
+	PINGREQ  // 12
+	PINGRESP // 13
 
-	DISCONNECT //14
+	DISCONNECT // 14
 )
 
 var null_string = ""
@@ -65,21 +65,27 @@ type Pack struct {
 func (pack *Pack) GetVariable() interface{} {
 	return pack.variable
 }
+
 func (pack *Pack) GetType() byte {
 	return pack.msg_type
 }
+
 func (pack *Pack) SetType(typ byte) {
 	pack.msg_type = typ
 }
+
 func (pack *Pack) GetDup() byte {
 	return pack.dup_flag
 }
+
 func (pack *Pack) SetDup(dup byte) {
 	pack.dup_flag = dup
 }
+
 func (pack *Pack) GetQos() byte {
 	return pack.qos_level
 }
+
 func (pack *Pack) SetQos(qos byte) {
 	pack.qos_level = qos
 }
@@ -147,6 +153,7 @@ func (c *Connect) IsCleanSession() bool {
 func (c *Connect) GetProtocol() *string {
 	return c.protocol
 }
+
 func (c *Connect) GetVersion() byte {
 	return c.version
 }
@@ -159,6 +166,7 @@ type Connack struct {
 func (c *Connack) GetReturnCode() byte {
 	return c.return_code
 }
+
 func (c *Connack) SetReturnCode(return_code byte) {
 	c.return_code = return_code
 }
@@ -200,6 +208,7 @@ type Puback struct {
 func (ack *Puback) SetMid(id int) {
 	ack.mid = id
 }
+
 func (ack *Puback) GetMid() int {
 	return ack.mid
 }
@@ -212,9 +221,11 @@ type Topics struct {
 func (top *Topics) SetQos(Qos byte) {
 	top.Qos = Qos
 }
+
 func (top *Topics) GetQos() byte {
 	return top.Qos
 }
+
 func (top *Topics) GetName() *string {
 	return top.name
 }
@@ -233,9 +244,9 @@ func (sub *Subscribe) GetMid() int {
 }
 
 func (sub *Subscribe) addTopics(top Topics) {
-	//n := len(sub.topics)
-	//sub.topics = sub.topics[0 : n+1]
-	//sub.topics[n] = top
+	// n := len(sub.topics)
+	// sub.topics = sub.topics[0 : n+1]
+	// sub.topics[n] = top
 	sub.topics = append(sub.topics, top)
 }
 
@@ -245,7 +256,7 @@ func (sub *Subscribe) GetTopics() []Topics {
 
 type Suback struct {
 	mid int
-	Qos byte //0  2
+	Qos byte // 0  2
 }
 
 type UNTopics struct {
@@ -264,14 +275,15 @@ type UNSubscribe struct {
 func (sub *UNSubscribe) SetMid(id int) {
 	sub.mid = id
 }
+
 func (sub *UNSubscribe) GetMid() int {
 	return sub.mid
 }
 
 func (sub *UNSubscribe) addTopics(top Topics) {
-	//n := len(sub.topics)
-	//sub.topics = sub.topics[0 : n+1]
-	//sub.topics[n] = top
+	// n := len(sub.topics)
+	// sub.topics = sub.topics[0 : n+1]
+	// sub.topics[n] = top
 	sub.topics = append(sub.topics, top)
 }
 
@@ -359,7 +371,7 @@ func ReadPack(r *bufio.Reader, max_pack_length int) (pack *Pack, err error) {
 	case CONNECT:
 		// Read the protocol name
 		var flags byte
-		var conn = new(Connect)
+		conn := new(Connect)
 		pack.variable = conn
 		conn.protocol, n, err = readString(r)
 		if err != nil {
@@ -524,9 +536,9 @@ func ReadPack(r *bufio.Reader, max_pack_length int) (pack *Pack, err error) {
 		if err != nil {
 			break
 		}
-		vlen := pack.length //The length of the payload
+		vlen := pack.length // The length of the payload
 
-		for vlen > 3 { //一个Top至少大于 3字节
+		for vlen > 3 { // 一个Top至少大于 3字节
 			// Read the topic list
 			top := new(Topics)
 			nlen, err := readInt(r, 2)
@@ -572,9 +584,9 @@ func ReadPack(r *bufio.Reader, max_pack_length int) (pack *Pack, err error) {
 		if err != nil {
 			break
 		}
-		vlen := pack.length //The length of the payload
+		vlen := pack.length // The length of the payload
 
-		for vlen > 3 { //一个Top至少大于 3字节
+		for vlen > 3 { // 一个Top至少大于 3字节
 			// Read the topic list
 			top := new(Topics)
 			nlen, err := readInt(r, 2)
@@ -607,7 +619,7 @@ func ReadPack(r *bufio.Reader, max_pack_length int) (pack *Pack, err error) {
 	case DISCONNECT:
 	// Pass, nothing to do.
 	default:
-		//将pack剩余中的数据读了
+		// 将pack剩余中的数据读了
 		log.Error("No Find Pack(%v) length(%v)", pack.msg_type, pack.length)
 		if pack.length > 0 {
 			buf := make([]byte, pack.length)
@@ -740,9 +752,9 @@ func DelayWritePack(pack *Pack, w *bufio.Writer) (err error) {
 		sub := pack.variable.(*Subscribe)
 		tnum := 0
 		for _, top := range sub.topics {
-			tnum = tnum + 2 + len([]byte(*top.name)) + 1 //Qos
+			tnum = tnum + 2 + len([]byte(*top.name)) + 1 // Qos
 		}
-		//The length of the payload. It can be a multibyte field.
+		// The length of the payload. It can be a multibyte field.
 		if err = w.WriteByte(getRemainingLength(tnum)[0]); err != nil {
 			return
 		}
@@ -780,7 +792,7 @@ func DelayWritePack(pack *Pack, w *bufio.Writer) (err error) {
 		for _, top := range sub.topics {
 			tnum = tnum + 2 + len([]byte(*top.name)) //
 		}
-		//The length of the payload. It can be a multibyte field.
+		// The length of the payload. It can be a multibyte field.
 		if err = w.WriteByte(getRemainingLength(tnum)[0]); err != nil {
 			return
 		}
@@ -842,6 +854,7 @@ func writeString(w *bufio.Writer, s *string) error {
 	}
 	return writeFull(w, data)
 }
+
 func writeInt(w *bufio.Writer, i, size int) error {
 	b := make([]byte, size)
 	binary.BigEndian.PutUint16(b, uint16(i))
@@ -940,6 +953,7 @@ func GetSubAckPack(mid int) *Pack {
 	pack.variable = ack
 	return pack
 }
+
 func GetUNSubAckPack(mid int) *Pack {
 	pack := new(Pack)
 	pack.SetType(UNSUBACK)

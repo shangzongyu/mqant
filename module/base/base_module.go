@@ -20,16 +20,16 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/liangdas/mqant/conf"
-	"github.com/liangdas/mqant/log"
-	"github.com/liangdas/mqant/module"
-	mqrpc "github.com/liangdas/mqant/rpc"
-	rpcpb "github.com/liangdas/mqant/rpc/pb"
-	"github.com/liangdas/mqant/selector"
-	"github.com/liangdas/mqant/server"
-	"github.com/liangdas/mqant/service"
-	mqanttools "github.com/liangdas/mqant/utils"
 	"github.com/pkg/errors"
+	"github.com/shangzongyu/mqant/conf"
+	"github.com/shangzongyu/mqant/log"
+	"github.com/shangzongyu/mqant/module"
+	mqrpc "github.com/shangzongyu/mqant/rpc"
+	rpcpb "github.com/shangzongyu/mqant/rpc/pb"
+	"github.com/shangzongyu/mqant/selector"
+	"github.com/shangzongyu/mqant/server"
+	"github.com/shangzongyu/mqant/service"
+	mqanttools "github.com/shangzongyu/mqant/utils"
 )
 
 // BaseModule 默认的RPCModule实现
@@ -47,7 +47,7 @@ type BaseModule struct {
 // GetServerId GetServerId
 // Deprecated: 因为命名规范问题函数将废弃,请用GetServerID代替
 func (m *BaseModule) GetServerId() string {
-	//很关键,需要与配置文件中的Module配置对应
+	// 很关键,需要与配置文件中的Module配置对应
 	if m.service != nil && m.service.Server() != nil {
 		return m.service.Server().ID()
 	}
@@ -56,7 +56,7 @@ func (m *BaseModule) GetServerId() string {
 
 // GetServerID 节点ID
 func (m *BaseModule) GetServerID() string {
-	//很关键,需要与配置文件中的Module配置对应
+	// 很关键,需要与配置文件中的Module配置对应
 	if m.service != nil && m.service.Server() != nil {
 		return m.service.Server().ID()
 	}
@@ -80,22 +80,21 @@ func (m *BaseModule) GetServer() server.Server {
 
 // OnConfChanged 当配置变更时调用
 func (m *BaseModule) OnConfChanged(settings *conf.ModuleSettings) {
-
 }
 
 // OnAppConfigurationLoaded 当应用配置加载完成时调用
 func (m *BaseModule) OnAppConfigurationLoaded(app module.App) {
 	m.App = app
-	//当App初始化时调用，这个接口不管这个模块是否在这个进程运行都会调用
+	// 当App初始化时调用，这个接口不管这个模块是否在这个进程运行都会调用
 }
 
 // OnInit 当模块初始化时调用
 func (m *BaseModule) OnInit(subclass module.RPCModule, app module.App, settings *conf.ModuleSettings, opt ...server.Option) {
-	//初始化模块
+	// 初始化模块
 	m.App = app
 	m.subclass = subclass
 	m.settings = settings
-	//创建一个远程调用的RPC
+	// 创建一个远程调用的RPC
 
 	opts := server.Options{
 		Metadata: map[string]string{},
@@ -156,12 +155,12 @@ func (m *BaseModule) OnInit(subclass module.RPCModule, app module.App, settings 
 
 // OnDestroy 当模块注销时调用
 func (m *BaseModule) OnDestroy() {
-	//注销模块
-	//一定别忘了关闭RPC
+	// 注销模块
+	// 一定别忘了关闭RPC
 	m.exit()
 	select {
 	case <-m.serviceStopeds:
-		//等待注册中心注销完成
+		// 等待注册中心注销完成
 	}
 	_ = m.GetServer().OnDestroy()
 }
@@ -289,5 +288,5 @@ func (m *BaseModule) OnComplete(fn string, callInfo *mqrpc.CallInfo, result *rpc
 // GetExecuting GetExecuting
 func (m *BaseModule) GetExecuting() int64 {
 	return 0
-	//return m.GetServer().GetRPCServer().GetExecuting()
+	// return m.GetServer().GetRPCServer().GetExecuting()
 }

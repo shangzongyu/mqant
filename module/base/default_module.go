@@ -19,9 +19,9 @@ import (
 	"runtime"
 	"sync"
 
-	"github.com/liangdas/mqant/conf"
-	"github.com/liangdas/mqant/log"
-	"github.com/liangdas/mqant/module"
+	"github.com/shangzongyu/mqant/conf"
+	"github.com/shangzongyu/mqant/log"
+	"github.com/shangzongyu/mqant/module"
 )
 
 // DefaultModule 模块结构

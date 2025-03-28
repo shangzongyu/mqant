@@ -3,11 +3,11 @@ package module
 import (
 	"time"
 
-	"github.com/liangdas/mqant/registry"
-	mqrpc "github.com/liangdas/mqant/rpc"
-	rpcpb "github.com/liangdas/mqant/rpc/pb"
-	"github.com/liangdas/mqant/selector"
 	"github.com/nats-io/nats.go"
+	"github.com/shangzongyu/mqant/registry"
+	mqrpc "github.com/shangzongyu/mqant/rpc"
+	rpcpb "github.com/shangzongyu/mqant/rpc/pb"
+	"github.com/shangzongyu/mqant/selector"
 )
 
 // Option 配置项
@@ -18,7 +18,7 @@ type Options struct {
 	Nats        *nats.Conn
 	Version     string
 	Debug       bool
-	Parse       bool //是否由框架解析启动环境变量,默认为true
+	Parse       bool // 是否由框架解析启动环境变量,默认为true
 	WorkDir     string
 	ConfPath    string
 	LogDir      string

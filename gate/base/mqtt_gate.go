@@ -18,19 +18,21 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/liangdas/mqant/conf"
-	"github.com/liangdas/mqant/gate"
-	"github.com/liangdas/mqant/log"
-	"github.com/liangdas/mqant/module"
-	basemodule "github.com/liangdas/mqant/module/base"
-	"github.com/liangdas/mqant/network"
+	"github.com/shangzongyu/mqant/conf"
+	"github.com/shangzongyu/mqant/gate"
+	"github.com/shangzongyu/mqant/log"
+	"github.com/shangzongyu/mqant/module"
+	basemodule "github.com/shangzongyu/mqant/module/base"
+	"github.com/shangzongyu/mqant/network"
 )
 
-var RPCParamSessionType = gate.RPCParamSessionType
-var RPCParamProtocolMarshalType = gate.RPCParamProtocolMarshalType
+var (
+	RPCParamSessionType         = gate.RPCParamSessionType
+	RPCParamProtocolMarshalType = gate.RPCParamProtocolMarshalType
+)
 
 type Gate struct {
-	//module.RPCSerialize
+	// module.RPCSerialize
 	basemodule.BaseModule
 	opts       gate.Options
 	judgeGuest func(session gate.Session) bool
@@ -83,27 +85,35 @@ func (gt *Gate) SetCreateAgent(cfunc func() gate.Agent) error {
 	gt.createAgent = cfunc
 	return nil
 }
+
 func (gt *Gate) Options() gate.Options {
 	return gt.opts
 }
+
 func (gt *Gate) GetStorageHandler() (storage gate.StorageHandler) {
 	return gt.opts.StorageHandler
 }
+
 func (gt *Gate) GetGateHandler() gate.GateHandler {
 	return gt.opts.GateHandler
 }
+
 func (gt *Gate) GetAgentLearner() gate.AgentLearner {
 	return gt.opts.AgentLearner
 }
+
 func (gt *Gate) GetSessionLearner() gate.SessionLearner {
 	return gt.opts.SessionLearner
 }
+
 func (gt *Gate) GetRouteHandler() gate.RouteHandler {
 	return gt.opts.RouteHandler
 }
+
 func (gt *Gate) GetJudgeGuest() func(session gate.Session) bool {
 	return gt.judgeGuest
 }
+
 func (gt *Gate) GetModule() module.RPCModule {
 	return gt.GetSubclass()
 }
@@ -123,7 +133,7 @@ func (gt *Gate) OnConfChanged(settings *conf.ModuleSettings) {
 func (gt *Gate) Serialize(param interface{}) (ptype string, p []byte, err error) {
 	rv := reflect.ValueOf(param)
 	if rv.Kind() != reflect.Ptr || rv.IsNil() {
-		//不是指针
+		// 不是指针
 		return "", nil, fmt.Errorf("Serialize [%v ] or not pointer type", rv.Type())
 	}
 	switch v2 := param.(type) {
@@ -168,7 +178,7 @@ type SessionSerialize struct {
 func (gt *SessionSerialize) Serialize(param interface{}) (ptype string, p []byte, err error) {
 	rv := reflect.ValueOf(param)
 	if rv.Kind() != reflect.Ptr || rv.IsNil() {
-		//不是指针
+		// 不是指针
 		return "", nil, fmt.Errorf("Serialize [%v ] or not pointer type", rv.Type())
 	}
 	switch v2 := param.(type) {
@@ -206,16 +216,17 @@ func (gt *SessionSerialize) GetTypes() []string {
 }
 
 func (gt *Gate) OnAppConfigurationLoaded(app module.App) {
-	//添加Session结构体的序列化操作类
-	gt.BaseModule.OnAppConfigurationLoaded(app) //这是必须的
+	// 添加Session结构体的序列化操作类
+	gt.BaseModule.OnAppConfigurationLoaded(app) // 这是必须的
 	err := app.AddRPCSerialize("gate", gt)
 	if err != nil {
 		log.Warning("Adding session structures failed to serialize interfaces %s", err.Error())
 	}
 }
+
 func (gt *Gate) OnInit(subclass module.RPCModule, app module.App, settings *conf.ModuleSettings, opts ...gate.Option) {
 	gt.opts = gate.NewOptions(opts...)
-	gt.BaseModule.OnInit(subclass, app, settings, gt.opts.Opts...) //这是必须的
+	gt.BaseModule.OnInit(subclass, app, settings, gt.opts.Opts...) // 这是必须的
 	if gt.opts.WsAddr == "" {
 		if WSAddr, ok := settings.Settings["WSAddr"]; ok {
 			gt.opts.WsAddr = WSAddr.(string)
@@ -325,5 +336,5 @@ func (gt *Gate) Run(closeSig chan bool) {
 }
 
 func (gt *Gate) OnDestroy() {
-	gt.BaseModule.OnDestroy() //这是必须的
+	gt.BaseModule.OnDestroy() // 这是必须的
 }

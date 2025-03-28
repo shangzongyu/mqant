@@ -19,12 +19,12 @@ import (
 	"os"
 	"time"
 
-	"github.com/liangdas/mqant/log"
-	"github.com/liangdas/mqant/module"
-	mqrpc "github.com/liangdas/mqant/rpc"
-	rpcpb "github.com/liangdas/mqant/rpc/pb"
-	argsutil "github.com/liangdas/mqant/rpc/util"
-	"github.com/liangdas/mqant/utils/uuid"
+	"github.com/shangzongyu/mqant/log"
+	"github.com/shangzongyu/mqant/module"
+	mqrpc "github.com/shangzongyu/mqant/rpc"
+	rpcpb "github.com/shangzongyu/mqant/rpc/pb"
+	argsutil "github.com/shangzongyu/mqant/rpc/util"
+	"github.com/shangzongyu/mqant/utils/uuid"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -61,7 +61,7 @@ func (c *RPCClient) CallArgs(ctx context.Context, _func string, ArgsType []strin
 		}
 	}
 	start := time.Now()
-	var correlation_id = uuid.Rand().Hex()
+	correlation_id := uuid.Rand().Hex()
 	rpcInfo := &rpcpb.RPCInfo{
 		Fn:       *proto.String(_func),
 		Reply:    *proto.Bool(true),
@@ -73,7 +73,7 @@ func (c *RPCClient) CallArgs(ctx context.Context, _func string, ArgsType []strin
 		Hostname: *proto.String(caller),
 	}
 	defer func() {
-		//异常日志都应该打印
+		// 异常日志都应该打印
 		if c.app.Options().ClientRPChandler != nil {
 			exec_time := time.Since(start).Nanoseconds()
 			c.app.Options().ClientRPChandler(c.app, *c.nats_client.session.GetNode(), rpcInfo, r, e, exec_time)
@@ -109,12 +109,13 @@ func (c *RPCClient) CallArgs(ctx context.Context, _func string, ArgsType []strin
 		_ = c.nats_client.Delete(rpcInfo.Cid)
 		c.close_callback_chan(callback)
 		return nil, "deadline exceeded"
-		//case <-time.After(time.Second * time.Duration(c.app.GetSettings().rpc.RPCExpired)):
+		// case <-time.After(time.Second * time.Duration(c.app.GetSettings().rpc.RPCExpired)):
 		//	close(callback)
 		//	c.nats_client.Delete(rpcInfo.Cid)
 		//	return nil, "deadline exceeded"
 	}
 }
+
 func (c *RPCClient) close_callback_chan(ch chan *rpcpb.ResultInfo) {
 	defer func() {
 		if recover() != nil {
@@ -124,9 +125,10 @@ func (c *RPCClient) close_callback_chan(ch chan *rpcpb.ResultInfo) {
 
 	close(ch) // panic if ch is closed
 }
+
 func (c *RPCClient) CallNRArgs(_func string, ArgsType []string, args [][]byte) (err error) {
 	caller, _ := os.Hostname()
-	var correlation_id = uuid.Rand().Hex()
+	correlation_id := uuid.Rand().Hex()
 	rpcInfo := &rpcpb.RPCInfo{
 		Fn:       *proto.String(_func),
 		Reply:    *proto.Bool(false),
@@ -161,9 +163,9 @@ func (c *RPCClient) Call(ctx context.Context, _func string, params ...interface{
 		if err != nil {
 			return nil, fmt.Sprintf("args[%d] error %s", k, err.Error())
 		}
-		switch v2 := param.(type) { //多选语句switch
+		switch v2 := param.(type) { // 多选语句switch
 		case log.TraceSpan:
-			//如果参数是这个需要拷贝一份新的再传
+			// 如果参数是这个需要拷贝一份新的再传
 			span = v2
 		}
 	}
@@ -189,7 +191,7 @@ func (c *RPCClient) CallNR(_func string, params ...interface{}) (err error) {
 			return fmt.Errorf("args[%d] error %s", k, err.Error())
 		}
 
-		switch v2 := param.(type) { //多选语句switch
+		switch v2 := param.(type) { // 多选语句switch
 		case log.TraceSpan:
 			span = v2
 		}

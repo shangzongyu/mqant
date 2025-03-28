@@ -5,7 +5,7 @@ import (
 	"time"
 
 	consul "github.com/hashicorp/consul/api"
-	"github.com/liangdas/mqant/registry"
+	"github.com/shangzongyu/mqant/registry"
 )
 
 // Connect specifies services should be registered as Consul Connect services

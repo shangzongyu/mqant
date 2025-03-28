@@ -19,11 +19,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/liangdas/mqant/log"
-	"github.com/liangdas/mqant/module"
-	mqrpc "github.com/liangdas/mqant/rpc"
-	rpcpb "github.com/liangdas/mqant/rpc/pb"
 	"github.com/nats-io/nats.go"
+	"github.com/shangzongyu/mqant/log"
+	"github.com/shangzongyu/mqant/module"
+	mqrpc "github.com/shangzongyu/mqant/rpc"
+	rpcpb "github.com/shangzongyu/mqant/rpc/pb"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -69,6 +69,7 @@ func NewNatsServer(app module.App, s *RPCServer) (*NatsServer, error) {
 	}()
 	return server, nil
 }
+
 func (s *NatsServer) Addr() string {
 	return s.addr
 }
@@ -92,7 +93,7 @@ func (s *NatsServer) Shutdown() (err error) {
 	s.isClose = true
 	select {
 	case <-s.stopeds:
-		//等待nats注销完成
+		// 等待nats注销完成
 	}
 	return
 }
@@ -113,7 +114,7 @@ func (s *NatsServer) Callback(callinfo *mqrpc.CallInfo) error {
 func (s *NatsServer) on_request_handle() (err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			var rn = ""
+			rn := ""
 			switch r.(type) {
 
 			case string:
@@ -136,7 +137,7 @@ func (s *NatsServer) on_request_handle() (err error) {
 	go func() {
 		select {
 		case <-s.done:
-			//服务关闭
+			// 服务关闭
 		}
 		s.subs.Unsubscribe()
 	}()
@@ -144,10 +145,10 @@ func (s *NatsServer) on_request_handle() (err error) {
 	for !s.isClose {
 		m, err := s.subs.NextMsg(time.Minute)
 		if err != nil && err == nats.ErrTimeout {
-			//fmt.Println(err.Error())
-			//log.Warning("NatsServer error with '%v'",err)
+			// fmt.Println(err.Error())
+			// log.Warning("NatsServer error with '%v'",err)
 			if !s.subs.IsValid() {
-				//订阅已关闭，需要重新订阅
+				// 订阅已关闭，需要重新订阅
 				s.subs, err = s.app.Transport().SubscribeSync(s.addr)
 				if err != nil {
 					log.Error("NatsServer SubscribeSync[1] error with '%v'", err)
@@ -158,7 +159,7 @@ func (s *NatsServer) on_request_handle() (err error) {
 		} else if err != nil {
 			log.Warning("NatsServer error with '%v'", err)
 			if !s.subs.IsValid() {
-				//订阅已关闭，需要重新订阅
+				// 订阅已关闭，需要重新订阅
 				s.subs, err = s.app.Transport().SubscribeSync(s.addr)
 				if err != nil {
 					log.Error("NatsServer SubscribeSync[2] error with '%v'", err)
@@ -177,7 +178,7 @@ func (s *NatsServer) on_request_handle() (err error) {
 				"reply_to": rpcInfo.ReplyTo,
 			}
 
-			callInfo.Agent = s //设置代理为NatsServer
+			callInfo.Agent = s // 设置代理为NatsServer
 
 			s.server.Call(callInfo)
 		} else {
@@ -188,8 +189,8 @@ func (s *NatsServer) on_request_handle() (err error) {
 }
 
 func (s *NatsServer) Unmarshal(data []byte) (*rpcpb.RPCInfo, error) {
-	//fmt.Println(msg)
-	//保存解码后的数据，Value可以为任意数据类型
+	// fmt.Println(msg)
+	// 保存解码后的数据，Value可以为任意数据类型
 	var rpcInfo rpcpb.RPCInfo
 	err := proto.Unmarshal(data, &rpcInfo)
 	if err != nil {
@@ -203,7 +204,7 @@ func (s *NatsServer) Unmarshal(data []byte) (*rpcpb.RPCInfo, error) {
 
 // goroutine safe
 func (s *NatsServer) MarshalResult(resultInfo *rpcpb.ResultInfo) ([]byte, error) {
-	//log.Error("",map2)
+	// log.Error("",map2)
 	b, err := proto.Marshal(resultInfo)
 	return b, err
 }

@@ -3,7 +3,7 @@ package selector
 import (
 	"context"
 
-	"github.com/liangdas/mqant/registry"
+	"github.com/shangzongyu/mqant/registry"
 )
 
 // Options Options

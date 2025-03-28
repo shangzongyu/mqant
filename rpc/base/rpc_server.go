@@ -21,11 +21,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/liangdas/mqant/log"
-	"github.com/liangdas/mqant/module"
-	mqrpc "github.com/liangdas/mqant/rpc"
-	rpcpb "github.com/liangdas/mqant/rpc/pb"
-	argsutil "github.com/liangdas/mqant/rpc/util"
+	"github.com/shangzongyu/mqant/log"
+	"github.com/shangzongyu/mqant/module"
+	mqrpc "github.com/shangzongyu/mqant/rpc"
+	rpcpb "github.com/shangzongyu/mqant/rpc/pb"
+	argsutil "github.com/shangzongyu/mqant/rpc/util"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -34,12 +34,12 @@ type RPCServer struct {
 	app            module.App
 	functions      map[string]*mqrpc.FunctionInfo
 	nats_server    *NatsServer
-	mq_chan        chan mqrpc.CallInfo //接收到请求信息的队列
-	wg             sync.WaitGroup      //任务阻塞
+	mq_chan        chan mqrpc.CallInfo // 接收到请求信息的队列
+	wg             sync.WaitGroup      // 任务阻塞
 	call_chan_done chan error
 	listener       mqrpc.RPCListener
-	control        mqrpc.GoroutineControl //控制模块可同时开启的最大协程数
-	executing      int64                  //正在执行的goroutine数量
+	control        mqrpc.GoroutineControl // 控制模块可同时开启的最大协程数
+	executing      int64                  // 正在执行的goroutine数量
 }
 
 func NewRPCServer(app module.App, module module.Module) (mqrpc.RPCServer, error) {
@@ -56,7 +56,7 @@ func NewRPCServer(app module.App, module module.Module) (mqrpc.RPCServer, error)
 	}
 	rpc_server.nats_server = nats_server
 
-	//go rpc_server.on_call_handle(rpc_server.mq_chan, rpc_server.call_chan_done)
+	// go rpc_server.on_call_handle(rpc_server.mq_chan, rpc_server.call_chan_done)
 
 	return rpc_server, nil
 }
@@ -68,6 +68,7 @@ func (this *RPCServer) Addr() string {
 func (s *RPCServer) SetListener(listener mqrpc.RPCListener) {
 	s.listener = listener
 }
+
 func (s *RPCServer) SetGoroutineControl(control mqrpc.GoroutineControl) {
 	s.control = control
 }
@@ -82,7 +83,6 @@ func (s *RPCServer) GetExecuting() int64 {
 
 // you must call the function before calling Open and Go
 func (s *RPCServer) Register(id string, f interface{}) {
-
 	if _, ok := s.functions[id]; ok {
 		panic(fmt.Sprintf("function id %v: already registered", id))
 	}
@@ -98,12 +98,10 @@ func (s *RPCServer) Register(id string, f interface{}) {
 		finfo.InType = append(finfo.InType, rv)
 	}
 	s.functions[id] = finfo
-
 }
 
 // you must call the function before calling Open and Go
 func (s *RPCServer) RegisterGO(id string, f interface{}) {
-
 	if _, ok := s.functions[id]; ok {
 		panic(fmt.Sprintf("function id %v: already registered", id))
 	}
@@ -127,8 +125,8 @@ func (s *RPCServer) Done() (err error) {
 	//close(s.mq_chan)   //关闭mq_chan通道
 	//<-s.call_chan_done //mq_chan通道的信息都已处理完
 	s.wg.Wait()
-	//s.call_chan_done <- nil
-	//关闭队列链接
+	// s.call_chan_done <- nil
+	// 关闭队列链接
 	if s.nats_server != nil {
 		err = s.nats_server.Shutdown()
 	}
@@ -158,7 +156,7 @@ func (s *RPCServer) Call(callInfo *mqrpc.CallInfo) error {
 
 func (s *RPCServer) doCallback(callInfo *mqrpc.CallInfo) {
 	if callInfo.RPCInfo.Reply {
-		//需要回复的才回复
+		// 需要回复的才回复
 		err := callInfo.Agent.(mqrpc.MQServer).Callback(callInfo)
 		if err != nil {
 			log.Warning("rpc callback erro :\n%s", err.Error())
@@ -174,7 +172,7 @@ func (s *RPCServer) doCallback(callInfo *mqrpc.CallInfo) {
 		//	log.Warning("timeout: This is Call %s %s", s.module.GetType(), callInfo.RPCInfo.Fn)
 		//}
 	} else {
-		//对于不需要回复的消息,可以判断一下是否出现错误，打印一些警告
+		// 对于不需要回复的消息,可以判断一下是否出现错误，打印一些警告
 		if callInfo.Result.Error != "" {
 			log.Warning("rpc callback erro :\n%s", callInfo.Result.Error)
 		}
@@ -185,8 +183,8 @@ func (s *RPCServer) doCallback(callInfo *mqrpc.CallInfo) {
 }
 
 func (s *RPCServer) _errorCallback(start time.Time, callInfo *mqrpc.CallInfo, Cid string, Error string) {
-	//异常日志都应该打印
-	//log.TError(span, "rpc Exec ModuleType = %v Func = %v Elapsed = %v ERROR:\n%v", s.module.GetType(), callInfo.RPCInfo.Fn, time.Since(start), Error)
+	// 异常日志都应该打印
+	// log.TError(span, "rpc Exec ModuleType = %v Func = %v Elapsed = %v ERROR:\n%v", s.module.GetType(), callInfo.RPCInfo.Fn, time.Since(start), Error)
 	resultInfo := rpcpb.NewResultInfo(Cid, Error, argsutil.NULL, nil)
 	callInfo.Result = resultInfo
 	callInfo.ExecTime = time.Since(start).Nanoseconds()
@@ -203,7 +201,7 @@ func (s *RPCServer) _runFunc(start time.Time, functionInfo *mqrpc.FunctionInfo, 
 	params := callInfo.RPCInfo.Args
 	ArgsType := callInfo.RPCInfo.ArgsType
 	if len(params) != fType.NumIn() {
-		//因为在调研的 _func的时候还会额外传递一个回调函数 cb
+		// 因为在调研的 _func的时候还会额外传递一个回调函数 cb
 		s._errorCallback(start, callInfo, callInfo.RPCInfo.Cid, fmt.Sprintf("The number of params %v is not adapted.%v", params, f.String()))
 		return
 	}
@@ -217,7 +215,7 @@ func (s *RPCServer) _runFunc(start time.Time, functionInfo *mqrpc.FunctionInfo, 
 			s.control.Finish()
 		}
 		if r := recover(); r != nil {
-			var rn = ""
+			rn := ""
 			switch r.(type) {
 
 			case string:
@@ -234,8 +232,8 @@ func (s *RPCServer) _runFunc(start time.Time, functionInfo *mqrpc.FunctionInfo, 
 		}
 	}()
 
-	//t:=RandInt64(2,3)
-	//time.Sleep(time.Second*time.Duration(t))
+	// t:=RandInt64(2,3)
+	// time.Sleep(time.Second*time.Duration(t))
 	// f 为函数地址
 	var in []reflect.Value
 	var input []interface{}
@@ -246,7 +244,7 @@ func (s *RPCServer) _runFunc(start time.Time, functionInfo *mqrpc.FunctionInfo, 
 			rv := fInType[k]
 			var elemp reflect.Value
 			if rv.Kind() == reflect.Ptr {
-				//如果是指针类型就得取到指针所代表的具体类型
+				// 如果是指针类型就得取到指针所代表的具体类型
 				elemp = reflect.New(rv.Elem())
 			} else {
 				elemp = reflect.New(rv)
@@ -258,14 +256,14 @@ func (s *RPCServer) _runFunc(start time.Time, functionInfo *mqrpc.FunctionInfo, 
 					s._errorCallback(start, callInfo, callInfo.RPCInfo.Cid, err.Error())
 					return
 				}
-				if pb == nil { //多选语句switch
+				if pb == nil { // 多选语句switch
 					in[k] = reflect.Zero(rv)
 				}
 				if rv.Kind() == reflect.Ptr {
-					//接收指针变量的参数
+					// 接收指针变量的参数
 					in[k] = reflect.ValueOf(elemp.Interface())
 				} else {
-					//接收值变量
+					// 接收值变量
 					in[k] = elemp.Elem()
 				}
 				input[k] = pb
@@ -275,30 +273,30 @@ func (s *RPCServer) _runFunc(start time.Time, functionInfo *mqrpc.FunctionInfo, 
 					s._errorCallback(start, callInfo, callInfo.RPCInfo.Cid, err.Error())
 					return
 				}
-				if pb == nil { //多选语句switch
+				if pb == nil { // 多选语句switch
 					in[k] = reflect.Zero(rv)
 				}
 				if rv.Kind() == reflect.Ptr {
-					//接收指针变量的参数
+					// 接收指针变量的参数
 					in[k] = reflect.ValueOf(elemp.Interface())
 				} else {
-					//接收值变量
+					// 接收值变量
 					in[k] = elemp.Elem()
 				}
 				input[k] = pb
 			} else {
-				//不是Marshaler 才尝试用 argsutil 解析
+				// 不是Marshaler 才尝试用 argsutil 解析
 				ty, err := argsutil.Bytes2Args(s.app, v, params[k])
 				if err != nil {
 					s._errorCallback(start, callInfo, callInfo.RPCInfo.Cid, err.Error())
 					return
 				}
-				switch v2 := ty.(type) { //多选语句switch
+				switch v2 := ty.(type) { // 多选语句switch
 				case nil:
 					in[k] = reflect.Zero(rv)
 				case []uint8:
 					if reflect.TypeOf(ty).AssignableTo(rv) {
-						//如果ty "继承" 于接受参数类型
+						// 如果ty "继承" 于接受参数类型
 						in[k] = reflect.ValueOf(ty)
 					} else {
 						elemp := reflect.New(rv)
@@ -332,7 +330,7 @@ func (s *RPCServer) _runFunc(start time.Time, functionInfo *mqrpc.FunctionInfo, 
 		s._errorCallback(start, callInfo, callInfo.RPCInfo.Cid, fmt.Sprintf("%s rpc func(%s) return error %s\n", s.module.GetType(), callInfo.RPCInfo.Fn, "func(....)(result interface{}, err error)"))
 		return
 	}
-	if len(out) > 0 { //prepare out paras
+	if len(out) > 0 { // prepare out paras
 		rs = make([]interface{}, len(out), len(out))
 		for i, v := range out {
 			rs[i] = v.Interface()
@@ -381,7 +379,7 @@ func (s *RPCServer) runFunc(callInfo *mqrpc.CallInfo) {
 	start := time.Now()
 	defer func() {
 		if r := recover(); r != nil {
-			var rn = ""
+			rn := ""
 			switch r.(type) {
 
 			case string:
@@ -395,7 +393,7 @@ func (s *RPCServer) runFunc(callInfo *mqrpc.CallInfo) {
 	}()
 
 	if s.control != nil {
-		//协程数量达到最大限制
+		// 协程数量达到最大限制
 		s.control.Wait()
 	}
 	functionInfo, ok := s.functions[callInfo.RPCInfo.Fn]

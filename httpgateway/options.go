@@ -12,20 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//Package httpgateway 网关配置
+// Package httpgateway 网关配置
 package httpgateway
 
 import (
 	"errors"
 	"fmt"
-	"github.com/liangdas/mqant/module"
-	"github.com/liangdas/mqant/registry"
-	"github.com/liangdas/mqant/selector"
 	"math/rand"
 	"net/http"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/shangzongyu/mqant/module"
+	"github.com/shangzongyu/mqant/registry"
+	"github.com/shangzongyu/mqant/selector"
 )
 
 // Service represents an API service
@@ -61,7 +62,7 @@ var DefaultRoute = func(app module.App, r *http.Request) (*Service, error) {
 			}
 
 			var mtx sync.Mutex
-			//log.Info("services[0] $v",services[0].Nodes[0])
+			// log.Info("services[0] $v",services[0].Nodes[0])
 			return func() (*registry.Node, error) {
 				mtx.Lock()
 				defer mtx.Unlock()

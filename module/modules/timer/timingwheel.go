@@ -2,9 +2,10 @@ package timewheel
 
 import (
 	"container/list"
-	"github.com/liangdas/mqant/log"
 	"math"
 	"time"
+
+	"github.com/shangzongyu/mqant/log"
 )
 
 var timeWheel *TimeWheel
@@ -20,7 +21,7 @@ type TaskData interface{}
 // TimeWheel 时间轮
 type TimeWheel struct {
 	interval    time.Duration // 指针每隔多久往前移动一格
-	accumulator int64         //累加器
+	accumulator int64         // 累加器
 	ticker      *time.Ticker
 	slots       []*list.List // 时间轮槽
 	// key: 定时器唯一标识 value: 定时器所在的槽, 主要用于删除定时器, 不会出现并发读写，不加锁直接访问
@@ -113,7 +114,7 @@ func (tw *TimeWheel) AddTimer(delay time.Duration, data TaskData, job Job) {
 	tw.addTaskChannel <- Task{delay: delay, data: data, job: job}
 }
 
-//可以通过key来撤销一个未执行的定时器
+// 可以通过key来撤销一个未执行的定时器
 func (tw *TimeWheel) AddTimerCustom(delay time.Duration, key interface{}, data TaskData, job Job) {
 	if delay <= 0 {
 		return
@@ -157,7 +158,7 @@ func (tw *TimeWheel) scanAndRunTask(l *list.List) {
 		go func() {
 			defer func() {
 				if r := recover(); r != nil {
-					var rn = ""
+					rn := ""
 					switch r.(type) {
 
 					case string:

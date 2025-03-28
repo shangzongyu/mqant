@@ -17,8 +17,9 @@ package mqrpc
 
 import (
 	"context"
-	"github.com/liangdas/mqant/rpc/pb"
 	"reflect"
+
+	"github.com/shangzongyu/mqant/rpc/pb"
 )
 
 // FunctionInfo handler接口信息
@@ -29,18 +30,18 @@ type FunctionInfo struct {
 	Goroutine bool
 }
 
-//MQServer 代理者
+// MQServer 代理者
 type MQServer interface {
 	Callback(callinfo *CallInfo) error
 }
 
-//CallInfo RPC的请求信息
+// CallInfo RPC的请求信息
 type CallInfo struct {
 	RPCInfo  *rpcpb.RPCInfo
 	Result   *rpcpb.ResultInfo
 	Props    map[string]interface{}
 	ExecTime int64
-	Agent    MQServer //代理者  AMQPServer / LocalServer 都继承 Callback(callinfo CallInfo)(error) 方法
+	Agent    MQServer // 代理者  AMQPServer / LocalServer 都继承 Callback(callinfo CallInfo)(error) 方法
 }
 
 // RPCListener 事件监听器

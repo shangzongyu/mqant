@@ -4,10 +4,10 @@ package server
 import (
 	"context"
 
-	"github.com/liangdas/mqant/conf"
-	"github.com/liangdas/mqant/module"
-	mqrpc "github.com/liangdas/mqant/rpc"
 	"github.com/pborman/uuid"
+	"github.com/shangzongyu/mqant/conf"
+	"github.com/shangzongyu/mqant/module"
+	mqrpc "github.com/shangzongyu/mqant/rpc"
 )
 
 // Server Server

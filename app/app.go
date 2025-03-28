@@ -29,24 +29,24 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/liangdas/mqant/conf"
-	basegate "github.com/liangdas/mqant/gate/base"
-	"github.com/liangdas/mqant/log"
-	"github.com/liangdas/mqant/module"
-	basemodule "github.com/liangdas/mqant/module/base"
-	"github.com/liangdas/mqant/module/modules"
-	"github.com/liangdas/mqant/registry"
-	mqrpc "github.com/liangdas/mqant/rpc"
-	"github.com/liangdas/mqant/selector"
-	"github.com/liangdas/mqant/selector/cache"
 	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
+	"github.com/shangzongyu/mqant/conf"
+	basegate "github.com/shangzongyu/mqant/gate/base"
+	"github.com/shangzongyu/mqant/log"
+	"github.com/shangzongyu/mqant/module"
+	basemodule "github.com/shangzongyu/mqant/module/base"
+	"github.com/shangzongyu/mqant/module/modules"
+	"github.com/shangzongyu/mqant/registry"
+	mqrpc "github.com/shangzongyu/mqant/rpc"
+	"github.com/shangzongyu/mqant/selector"
+	"github.com/shangzongyu/mqant/selector/cache"
 )
 
 type resultInfo struct {
 	Trace  string
-	Error  string      //错误结果 如果为nil表示请求正确
-	Result interface{} //结果
+	Error  string      // 错误结果 如果为nil表示请求正确
+	Result interface{} // 结果
 }
 
 type protocolMarshalImp struct {
@@ -67,7 +67,7 @@ func newOptions(opts ...module.Option) module.Options {
 		RegisterTTL:      time.Second * time.Duration(20),
 		KillWaitTTL:      time.Second * time.Duration(60),
 		RPCExpired:       time.Second * time.Duration(10),
-		RPCMaxCoroutine:  0, //不限制
+		RPCMaxCoroutine:  0, // 不限制
 		Debug:            true,
 		Parse:            true,
 		LogFileName: func(logdir, prefix, processID, suffix string) string {
@@ -88,14 +88,14 @@ func newOptions(opts ...module.Option) module.Options {
 		ProcessID = flag.String("pid", "development", "Server ProcessID?")
 		Logdir = flag.String("log", "", "Log file directory?")
 		BIdir = flag.String("bi", "", "bi file directory?")
-		flag.Parse() //解析输入的参数
+		flag.Parse() // 解析输入的参数
 	}
 
 	if opt.Nats == nil {
 		nc, err := nats.Connect(nats.DefaultURL)
 		if err != nil {
 			log.Error("nats agent: %s", err.Error())
-			//panic(fmt.Sprintf("nats agent: %s", err.Error()))
+			// panic(fmt.Sprintf("nats agent: %s", err.Error()))
 		}
 		opt.Nats = nc
 	}
@@ -184,13 +184,13 @@ func NewApp(opts ...module.Option) module.App {
 
 // DefaultApp 默认应用
 type DefaultApp struct {
-	//module.App
+	// module.App
 	version       string
 	settings      conf.Config
 	serverList    sync.Map
 	opts          module.Options
 	defaultRoutes func(app module.App, Type string, hash string) module.ServerSession
-	//将一个RPC调用路由到新的路由上
+	// 将一个RPC调用路由到新的路由上
 	mapRoute            func(app module.App, route string) string
 	rpcserializes       map[string]module.RPCSerialize
 	configurationLoaded func(app module.App)
@@ -203,9 +203,9 @@ type DefaultApp struct {
 func (app *DefaultApp) Run(mods ...module.Module) error {
 	var cof conf.Config
 	fmt.Println("Server configuration path :", app.opts.ConfPath)
-	conf.LoadConfig(app.opts.ConfPath) //加载配置文件
+	conf.LoadConfig(app.opts.ConfPath) // 加载配置文件
 	cof = conf.Conf
-	app.Configure(cof) //解析配置信息
+	app.Configure(cof) // 解析配置信息
 
 	if app.configurationLoaded != nil {
 		app.configurationLoaded(app)
@@ -227,7 +227,7 @@ func (app *DefaultApp) Run(mods ...module.Module) error {
 	log.Info("mqant %v starting up", app.opts.Version)
 
 	manager := basemodule.NewModuleManager()
-	manager.RegisterRunMod(modules.TimerModule()) //注册时间轮模块 每一个进程都默认运行
+	manager.RegisterRunMod(modules.TimerModule()) // 注册时间轮模块 每一个进程都默认运行
 
 	// module
 	for i := range mods {
@@ -246,7 +246,7 @@ func (app *DefaultApp) Run(mods ...module.Module) error {
 	sig := <-c
 	log.BiBeego().Flush()
 	log.LogBeego().Flush()
-	//如果一分钟都关不了则强制关闭
+	// 如果一分钟都关不了则强制关闭
 	timeout := time.NewTimer(app.opts.KillWaitTTL)
 	wait := make(chan struct{})
 	go func() {
@@ -309,7 +309,7 @@ func (app *DefaultApp) GetRPCSerialize() map[string]module.RPCSerialize {
 
 // Watcher Watcher
 func (app *DefaultApp) Watcher(node *registry.Node) {
-	//把注销的服务ServerSession删除掉
+	// 把注销的服务ServerSession删除掉
 	session, ok := app.serverList.Load(node.Id)
 	if ok && session != nil {
 		session.(module.ServerSession).GetRpc().Done()
@@ -325,13 +325,11 @@ func (app *DefaultApp) Configure(settings conf.Config) error {
 
 // OnInit 初始化
 func (app *DefaultApp) OnInit(settings conf.Config) error {
-
 	return nil
 }
 
 // OnDestroy 应用退出
 func (app *DefaultApp) OnDestroy() error {
-
 	return nil
 }
 
@@ -385,7 +383,6 @@ func (app *DefaultApp) GetServerBySelector(serviceName string, opts ...selector.
 	}
 	session.(module.ServerSession).SetNode(node)
 	return session.(module.ServerSession), nil
-
 }
 
 // GetServersByType 通过服务类型获取服务实例列表
@@ -397,7 +394,7 @@ func (app *DefaultApp) GetServersByType(serviceName string) []module.ServerSessi
 		return sessions
 	}
 	for _, service := range services {
-		//log.TInfo(nil,"GetServersByType3 %v %v",Type,service.Nodes)
+		// log.TInfo(nil,"GetServersByType3 %v %v",Type,service.Nodes)
 		for _, node := range service.Nodes {
 			session, ok := app.serverList.Load(node.Id)
 			if !ok {
@@ -420,7 +417,7 @@ func (app *DefaultApp) GetServersByType(serviceName string) []module.ServerSessi
 // GetRouteServer 通过选择器过滤服务实例
 func (app *DefaultApp) GetRouteServer(filter string, opts ...selector.SelectOption) (s module.ServerSession, err error) {
 	if app.mapRoute != nil {
-		//进行一次路由转换
+		// 进行一次路由转换
 		filter = app.mapRoute(app, filter)
 	}
 	sl := strings.Split(filter, "@")

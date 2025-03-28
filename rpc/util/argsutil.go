@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//      http://www.apache.org/licenses/LICENSE-2.0
+//	http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,29 +16,30 @@ package argsutil
 import (
 	"encoding/json"
 	"fmt"
-	"google.golang.org/protobuf/proto"
-	"github.com/liangdas/mqant/log"
-	"github.com/liangdas/mqant/module"
-	"github.com/liangdas/mqant/rpc"
-	"github.com/liangdas/mqant/utils"
 	"reflect"
 	"strings"
+
+	"github.com/shangzongyu/mqant/log"
+	"github.com/shangzongyu/mqant/module"
+	"github.com/shangzongyu/mqant/rpc"
+	"github.com/shangzongyu/mqant/utils"
+	"google.golang.org/protobuf/proto"
 )
 
 var (
-	NULL    = "null"    //nil   null
-	BOOL    = "bool"    //bool
-	INT     = "int"     //int
-	LONG    = "long"    //long64
-	FLOAT   = "float"   //float32
-	DOUBLE  = "double"  //float64
+	NULL    = "null"    // nil   null
+	BOOL    = "bool"    // bool
+	INT     = "int"     // int
+	LONG    = "long"    // long64
+	FLOAT   = "float"   // float32
+	DOUBLE  = "double"  // float64
 	BYTES   = "bytes"   //[]byte
-	STRING  = "string"  //string
-	MAP     = "map"     //map[string]interface{}
-	MAPSTR  = "mapstr"  //map[string]string{}
-	TRACE   = "trace"   //log.TraceSpanImp
-	Marshal = "marshal" //mqrpc.Marshaler
-	Proto   = "proto"   //proto.Message
+	STRING  = "string"  // string
+	MAP     = "map"     // map[string]interface{}
+	MAPSTR  = "mapstr"  // map[string]string{}
+	TRACE   = "trace"   // log.TraceSpanImp
+	Marshal = "marshal" // mqrpc.Marshaler
+	Proto   = "proto"   // proto.Message
 )
 
 func ArgsTypeAnd2Bytes(app module.App, arg interface{}) (string, []byte, error) {
@@ -94,18 +95,18 @@ func ArgsTypeAnd2Bytes(app module.App, arg interface{}) (string, []byte, error) 
 		for _, v := range app.GetRPCSerialize() {
 			ptype, vk, err := v.Serialize(arg)
 			if err == nil {
-				//解析成功了
+				// 解析成功了
 				return ptype, vk, err
 			}
 		}
 
 		rv := reflect.ValueOf(arg)
 		if rv.Kind() != reflect.Ptr {
-			//不是指针
+			// 不是指针
 			return "", nil, fmt.Errorf("Args2Bytes [%v] not registered to app.addrpcserialize(...) structure type or not *mqrpc.marshaler pointer type", reflect.TypeOf(arg))
 		} else {
 			if rv.IsNil() {
-				//如果是nil则直接返回
+				// 如果是nil则直接返回
 				return NULL, nil, nil
 			}
 			if v2, ok := arg.(mqrpc.Marshaler); ok {
@@ -180,7 +181,7 @@ func Bytes2Args(app module.App, argsType string, args []byte) (interface{}, erro
 		for _, v := range app.GetRPCSerialize() {
 			vk, err := v.Deserialize(argsType, args)
 			if err == nil {
-				//解析成功了
+				// 解析成功了
 				return vk, err
 			}
 		}

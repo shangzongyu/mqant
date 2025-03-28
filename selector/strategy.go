@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/liangdas/mqant/registry"
+	"github.com/shangzongyu/mqant/registry"
 )
 
 func init() {
@@ -38,7 +38,7 @@ func RoundRobin(services []*registry.Service) Next {
 		nodes = append(nodes, service.Nodes...)
 	}
 
-	var i = rand.Int()
+	i := rand.Int()
 	var mtx sync.Mutex
 
 	return func() (*registry.Node, error) {

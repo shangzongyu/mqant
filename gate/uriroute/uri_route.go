@@ -7,11 +7,11 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/liangdas/mqant/gate"
-	"github.com/liangdas/mqant/log"
-	"github.com/liangdas/mqant/module"
-	argsutil "github.com/liangdas/mqant/rpc/util"
 	"github.com/pkg/errors"
+	"github.com/shangzongyu/mqant/gate"
+	"github.com/shangzongyu/mqant/log"
+	"github.com/shangzongyu/mqant/module"
+	argsutil "github.com/shangzongyu/mqant/rpc/util"
 )
 
 // FSelector 服务节点选择函数，可以自定义服务筛选规则
@@ -101,13 +101,13 @@ func (u *URIRoute) OnRoute(session gate.Session, topic string, msg []byte) (bool
 	} else {
 		moduleType := uu.Scheme
 		if uu.Hostname() == "modulus" {
-			//取模
+			// 取模
 		} else if uu.Hostname() == "cache" {
-			//缓存
+			// 缓存
 		} else if uu.Hostname() == "random" {
-			//随机
+			// 随机
 		} else {
-			//其他规则就是 module://[user:pass@]nodeId/path
+			// 其他规则就是 module://[user:pass@]nodeId/path
 			moduleType = fmt.Sprintf("%v@%v", moduleType, uu.Hostname())
 		}
 		ss, err := u.module.GetRouteServer(moduleType)
@@ -141,7 +141,7 @@ func (u *URIRoute) OnRoute(session gate.Session, topic string, msg []byte) (bool
 
 	// 默认参数
 	if len(msg) > 0 && msg[0] == '{' && msg[len(msg)-1] == '}' {
-		//尝试解析为 json 为 map
+		// 尝试解析为 json 为 map
 		var obj interface{} // var obj map[string]interface{}
 		err := json.Unmarshal(msg, &obj)
 		if err != nil {

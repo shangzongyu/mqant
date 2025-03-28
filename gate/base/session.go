@@ -20,11 +20,11 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/liangdas/mqant/gate"
-	"github.com/liangdas/mqant/log"
-	"github.com/liangdas/mqant/module"
-	mqrpc "github.com/liangdas/mqant/rpc"
-	mqanttools "github.com/liangdas/mqant/utils"
+	"github.com/shangzongyu/mqant/gate"
+	"github.com/shangzongyu/mqant/log"
+	"github.com/shangzongyu/mqant/module"
+	mqrpc "github.com/shangzongyu/mqant/rpc"
+	mqanttools "github.com/shangzongyu/mqant/utils"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -147,7 +147,7 @@ func (sesid *sessionagent) ImportSettings(settings map[string]string) error {
 	} else {
 		for k, v := range settings {
 			if _, ok := sesid.session.GetSettings()[k]; ok {
-				//不用替换
+				// 不用替换
 			} else {
 				sesid.session.GetSettings()[k] = v
 			}
@@ -164,37 +164,47 @@ func (sesid *sessionagent) LocalUserData() interface{} {
 func (sesid *sessionagent) SetIP(ip string) {
 	sesid.session.IP = ip
 }
+
 func (sesid *sessionagent) SetTopic(topic string) {
 	sesid.session.Topic = topic
 }
+
 func (sesid *sessionagent) SetNetwork(network string) {
 	sesid.session.Network = network
 }
+
 func (sesid *sessionagent) SetUserID(userid string) {
 	sesid.lock.Lock()
 	sesid.session.UserId = userid
 	sesid.lock.Unlock()
 }
+
 func (sesid *sessionagent) SetUserId(userid string) {
 	sesid.SetUserID(userid)
 }
+
 func (sesid *sessionagent) SetSessionID(sessionid string) {
 	sesid.session.SessionId = sessionid
 }
+
 func (sesid *sessionagent) SetSessionId(sessionid string) {
 	sesid.SetSessionID(sessionid)
 }
+
 func (sesid *sessionagent) SetServerID(serverid string) {
 	sesid.session.ServerId = serverid
 }
+
 func (sesid *sessionagent) SetServerId(serverid string) {
 	sesid.SetServerID(serverid)
 }
+
 func (sesid *sessionagent) SetSettings(settings map[string]string) {
 	sesid.lock.Lock()
 	sesid.session.Settings = settings
 	sesid.lock.Unlock()
 }
+
 func (sesid *sessionagent) CloneSettings() map[string]string {
 	sesid.lock.Lock()
 	defer sesid.lock.Unlock()
@@ -204,18 +214,21 @@ func (sesid *sessionagent) CloneSettings() map[string]string {
 	}
 	return tmp
 }
+
 func (sesid *sessionagent) SetLocalKV(key, value string) error {
 	sesid.lock.Lock()
 	sesid.session.GetSettings()[key] = value
 	sesid.lock.Unlock()
 	return nil
 }
+
 func (sesid *sessionagent) RemoveLocalKV(key string) error {
 	sesid.lock.Lock()
 	delete(sesid.session.GetSettings(), key)
 	sesid.lock.Unlock()
 	return nil
 }
+
 func (sesid *sessionagent) SetLocalUserData(data interface{}) error {
 	sesid.userdata = data
 	return nil
@@ -296,6 +309,7 @@ func (sesid *sessionagent) Marshal() ([]byte, error) {
 	} // 进行解码
 	return data, nil
 }
+
 func (sesid *sessionagent) Unmarshal(data []byte) error {
 	se := &SessionImp{}
 	err := proto.Unmarshal(data, se)
@@ -310,6 +324,7 @@ func (sesid *sessionagent) Unmarshal(data []byte) error {
 	}
 	return nil
 }
+
 func (sesid *sessionagent) String() string {
 	return "gate.Session"
 }
@@ -327,7 +342,7 @@ func (sesid *sessionagent) Update() (err string) {
 	result, err := server.Call(nil, "Update", log.CreateTrace(sesid.TraceId(), sesid.SpanId()), sesid.session.SessionId)
 	if err == "" {
 		if result != nil {
-			//绑定成功,重新更新当前Session
+			// 绑定成功,重新更新当前Session
 			sesid.update(result.(gate.Session))
 		}
 	}
@@ -347,7 +362,7 @@ func (sesid *sessionagent) Bind(Userid string) (err string) {
 	result, err := server.Call(nil, "Bind", log.CreateTrace(sesid.TraceId(), sesid.SpanId()), sesid.session.SessionId, Userid)
 	if err == "" {
 		if result != nil {
-			//绑定成功,重新更新当前Session
+			// 绑定成功,重新更新当前Session
 			sesid.update(result.(gate.Session))
 		}
 	}
@@ -367,7 +382,7 @@ func (sesid *sessionagent) UnBind() (err string) {
 	result, err := server.Call(nil, "UnBind", log.CreateTrace(sesid.TraceId(), sesid.SpanId()), sesid.session.SessionId)
 	if err == "" {
 		if result != nil {
-			//绑定成功,重新更新当前Session
+			// 绑定成功,重新更新当前Session
 			sesid.update(result.(gate.Session))
 		}
 	}
@@ -393,7 +408,7 @@ func (sesid *sessionagent) Push() (err string) {
 	result, err := server.Call(nil, "Push", log.CreateTrace(sesid.TraceId(), sesid.SpanId()), sesid.session.SessionId, tmp)
 	if err == "" {
 		if result != nil {
-			//绑定成功,重新更新当前Session
+			// 绑定成功,重新更新当前Session
 			sesid.update(result.(gate.Session))
 		}
 	}
@@ -417,12 +432,13 @@ func (sesid *sessionagent) Set(key string, value string) (err string) {
 	)
 	if err == "" {
 		if result != nil {
-			//绑定成功,重新更新当前Session
+			// 绑定成功,重新更新当前Session
 			sesid.update(result.(gate.Session))
 		}
 	}
 	return
 }
+
 func (sesid *sessionagent) SetPush(key string, value string) (err string) {
 	if sesid.app == nil {
 		err = fmt.Sprintf("Module.App is nil")
@@ -436,6 +452,7 @@ func (sesid *sessionagent) SetPush(key string, value string) (err string) {
 	sesid.lock.Unlock()
 	return sesid.Push()
 }
+
 func (sesid *sessionagent) SetBatch(settings map[string]string) (err string) {
 	if sesid.app == nil {
 		err = fmt.Sprintf("Module.App is nil")
@@ -449,12 +466,13 @@ func (sesid *sessionagent) SetBatch(settings map[string]string) (err string) {
 	result, err := server.Call(nil, "Push", log.CreateTrace(sesid.TraceId(), sesid.SpanId()), sesid.session.SessionId, settings)
 	if err == "" {
 		if result != nil {
-			//绑定成功,重新更新当前Session
+			// 绑定成功,重新更新当前Session
 			sesid.update(result.(gate.Session))
 		}
 	}
 	return
 }
+
 func (sesid *sessionagent) Get(key string) (result string) {
 	sesid.lock.RLock()
 	if sesid.session.Settings == nil {
@@ -495,12 +513,13 @@ func (sesid *sessionagent) Remove(key string) (errStr string) {
 	)
 	if err == "" {
 		if result != nil {
-			//绑定成功,重新更新当前Session
+			// 绑定成功,重新更新当前Session
 			sesid.update(result.(gate.Session))
 		}
 	}
 	return
 }
+
 func (sesid *sessionagent) Send(topic string, body []byte) string {
 	if sesid.app == nil {
 		return fmt.Sprintf("Module.App is nil")

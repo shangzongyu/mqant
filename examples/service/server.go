@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/liangdas/mqant"
-	"github.com/liangdas/mqant/conf"
-	"github.com/liangdas/mqant/examples/proto/examples/greeter"
-	"github.com/liangdas/mqant/module"
-	basemodule "github.com/liangdas/mqant/module/base"
+	"github.com/shangzongyu/mqant"
+	"github.com/shangzongyu/mqant/conf"
+	"github.com/shangzongyu/mqant/examples/proto/examples/greeter"
+	"github.com/shangzongyu/mqant/module"
+	basemodule "github.com/shangzongyu/mqant/module/base"
 )
 
 type Greeter struct{}

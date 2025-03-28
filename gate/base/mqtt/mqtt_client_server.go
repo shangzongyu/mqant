@@ -21,8 +21,8 @@ import (
 	"math"
 	"sync"
 
-	"github.com/liangdas/mqant/conf"
-	"github.com/liangdas/mqant/network"
+	"github.com/shangzongyu/mqant/conf"
+	"github.com/shangzongyu/mqant/network"
 )
 
 var notAlive = errors.New("Connection was dead")
@@ -34,7 +34,7 @@ type PackRecover interface {
 type Client struct {
 	queue *PackQueue
 
-	recover PackRecover //消息接收者,从上层接口传过来的 只接收正式消息(心跳包,回复包等都不要)
+	recover PackRecover // 消息接收者,从上层接口传过来的 只接收正式消息(心跳包,回复包等都不要)
 
 	isStop bool
 	lock   *sync.Mutex
@@ -57,7 +57,6 @@ func NewClient(conf conf.Mqtt, recover PackRecover, r *bufio.Reader, w *bufio.Wr
 func (c *Client) Listen_loop() (e error) {
 	defer func() {
 		if r := recover(); r != nil {
-
 		}
 	}()
 
@@ -90,6 +89,7 @@ func (c *Client) getOnlineMsgId() int {
 		return c.curr_id
 	}
 }
+
 func (c *Client) waitPack(pAndErr *packAndErr) (err error) {
 	// If connetion has a error, should break
 	// if it return a timeout error, illustrate
@@ -99,7 +99,7 @@ func (c *Client) waitPack(pAndErr *packAndErr) (err error) {
 		err = pAndErr.err
 		return
 	}
-	//log.Debug("Client msg(%v)\n", pAndErr.pack.GetType())
+	// log.Debug("Client msg(%v)\n", pAndErr.pack.GetType())
 
 	// Choose the requst type
 	switch pAndErr.pack.GetType() {
@@ -109,8 +109,8 @@ func (c *Client) waitPack(pAndErr *packAndErr) (err error) {
 			err = errors.New("It's not a mqtt connection package.")
 			return
 		}
-		//id := info.GetUserName()
-		//psw := info.GetPassword()
+		// id := info.GetUserName()
+		// psw := info.GetPassword()
 		c.queue.SetAlive(conn.GetKeepAlive())
 		err = c.queue.WritePack(GetConnAckPack(0))
 	case PUBLISH:
@@ -120,64 +120,64 @@ func (c *Client) waitPack(pAndErr *packAndErr) (err error) {
 		//这里向上层转发消息
 		//log.Debug("Ack To Client Qos(%d) mid(%d) Topic(%v) msg(%s) \n",pAndErr.pack.GetQos(),pub.GetMid(), *pub.GetTopic(),pub.GetMsg())
 		if pAndErr.pack.GetQos() == 1 {
-			//回复已收到
-			//log.Debug("Ack To Client By PUBACK \n")
+			// 回复已收到
+			// log.Debug("Ack To Client By PUBACK \n")
 			err = c.queue.WritePack(GetPubAckPack(pub.GetMid()))
 			if err != nil {
-				//log.Debug("PUBACK error(%s) \n",err.Error())
+				// log.Debug("PUBACK error(%s) \n",err.Error())
 			}
 		} else if pAndErr.pack.GetQos() == 2 {
-			//log.Debug("Ack To Client By PUBREC \n")
+			// log.Debug("Ack To Client By PUBREC \n")
 			err = c.queue.WritePack(GetPubRECPack(pub.GetMid()))
 		}
-		//log.Debug("ss",string(pub.GetMsg()))
-		//目前这个版本暂时先不保证消息的Qos 默认用Qos=1吧
+		// log.Debug("ss",string(pub.GetMsg()))
+		// 目前这个版本暂时先不保证消息的Qos 默认用Qos=1吧
 		c.recover.OnRecover(pAndErr.pack)
-	case PUBACK: //4
-		//用于 Qos =1 的消息
-		//ack := pAndErr.pack.GetVariable().(*mqtt.Puback)
-		//log.Debug("Client Ack Qos(%d) Dup(%d) mid(%d) \n",pAndErr.pack.GetQos(),pAndErr.pack.GetDup(), ack.GetMid())
-	case PUBREC: //5
-		//log.Debug("Ack To Client By PUBREL \n")
-		//用于 Qos =2 的消息 回复 PUBREL
+	case PUBACK: // 4
+		// 用于 Qos =1 的消息
+		// ack := pAndErr.pack.GetVariable().(*mqtt.Puback)
+		// log.Debug("Client Ack Qos(%d) Dup(%d) mid(%d) \n",pAndErr.pack.GetQos(),pAndErr.pack.GetDup(), ack.GetMid())
+	case PUBREC: // 5
+		// log.Debug("Ack To Client By PUBREL \n")
+		// 用于 Qos =2 的消息 回复 PUBREL
 		ack := pAndErr.pack.GetVariable().(*Puback)
 		err = c.queue.WritePack(GetPubRELPack(ack.GetMid()))
-	case PUBREL: //6
-		//log.Debug("Ack To Client By PUBCOMP \n")
-		//用于 Qos =2 的消息 回复 PUBCOMP
+	case PUBREL: // 6
+		// log.Debug("Ack To Client By PUBCOMP \n")
+		// 用于 Qos =2 的消息 回复 PUBCOMP
 		ack := pAndErr.pack.GetVariable().(*Puback)
 		err = c.queue.WritePack(GetPubCOMPPack(ack.GetMid()))
-	case PUBCOMP: //7
-		//消息发送端最终确认这条消息
-		//log.Debug("消息最终确认")
-	case SUBSCRIBE: //7
-		//消息发送端最终确认这条消息
+	case PUBCOMP: // 7
+		// 消息发送端最终确认这条消息
+		// log.Debug("消息最终确认")
+	case SUBSCRIBE: // 7
+		// 消息发送端最终确认这条消息
 		sub := pAndErr.pack.GetVariable().(*Subscribe)
 		for _, top := range sub.GetTopics() {
-			//log.Debug("Subscribe %s",*top.GetName())
+			// log.Debug("Subscribe %s",*top.GetName())
 			if top.Qos == 2 {
-				//log.Debug("Ack To Client By Suback \n")
-				//用于 Qos =2 的消息 回复 PUBCOMP
+				// log.Debug("Ack To Client By Suback \n")
+				// 用于 Qos =2 的消息 回复 PUBCOMP
 				err = c.queue.WritePack(GetSubAckPack(sub.GetMid()))
 			}
 		}
-		//目前这个版本暂时先不保证消息的Qos 默认用Qos=1吧
+		// 目前这个版本暂时先不保证消息的Qos 默认用Qos=1吧
 		c.recover.OnRecover(pAndErr.pack)
-	case UNSUBSCRIBE: //7
-		//消息发送端最终确认这条消息
+	case UNSUBSCRIBE: // 7
+		// 消息发送端最终确认这条消息
 		sub := pAndErr.pack.GetVariable().(*UNSubscribe)
 		err = c.queue.WritePack(GetUNSubAckPack(sub.GetMid()))
-		//目前这个版本暂时先不保证消息的Qos 默认用Qos=1吧
+		// 目前这个版本暂时先不保证消息的Qos 默认用Qos=1吧
 		c.recover.OnRecover(pAndErr.pack)
 	case PINGREQ:
 		// Reply the heart beat
-		//log.Debug("hb msg")
+		// log.Debug("hb msg")
 		err = c.queue.WritePack(GetPingResp(0, pAndErr.pack.GetDup()))
 		c.recover.OnRecover(pAndErr.pack)
 	default:
 		// Not define pack type
-		//log.Debug("其他类型的数据包")
-		//err = fmt.Errorf("The type not define:%v\n", pAndErr.pack.GetType())
+		// log.Debug("其他类型的数据包")
+		// err = fmt.Errorf("The type not define:%v\n", pAndErr.pack.GetType())
 	}
 	return
 }

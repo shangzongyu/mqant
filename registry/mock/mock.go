@@ -1,56 +1,53 @@
 package mock
 
-import ()
-import "github.com/liangdas/mqant/registry"
+import "github.com/shangzongyu/mqant/registry"
 
 type mockRegistry struct {
 	Services map[string][]*registry.Service
 }
 
-var (
-	mockData = map[string][]*registry.Service{
-		"foo": []*registry.Service{
-			{
-				Name:    "foo",
-				Version: "1.0.0",
-				Nodes: []*registry.Node{
-					{
-						Id:      "foo-1.0.0-123",
-						Address: "localhost",
-						Port:    9999,
-					},
-					{
-						Id:      "foo-1.0.0-321",
-						Address: "localhost",
-						Port:    9999,
-					},
+var mockData = map[string][]*registry.Service{
+	"foo": {
+		{
+			Name:    "foo",
+			Version: "1.0.0",
+			Nodes: []*registry.Node{
+				{
+					Id:      "foo-1.0.0-123",
+					Address: "localhost",
+					Port:    9999,
 				},
-			},
-			{
-				Name:    "foo",
-				Version: "1.0.1",
-				Nodes: []*registry.Node{
-					{
-						Id:      "foo-1.0.1-321",
-						Address: "localhost",
-						Port:    6666,
-					},
-				},
-			},
-			{
-				Name:    "foo",
-				Version: "1.0.3",
-				Nodes: []*registry.Node{
-					{
-						Id:      "foo-1.0.3-345",
-						Address: "localhost",
-						Port:    8888,
-					},
+				{
+					Id:      "foo-1.0.0-321",
+					Address: "localhost",
+					Port:    9999,
 				},
 			},
 		},
-	}
-)
+		{
+			Name:    "foo",
+			Version: "1.0.1",
+			Nodes: []*registry.Node{
+				{
+					Id:      "foo-1.0.1-321",
+					Address: "localhost",
+					Port:    6666,
+				},
+			},
+		},
+		{
+			Name:    "foo",
+			Version: "1.0.3",
+			Nodes: []*registry.Node{
+				{
+					Id:      "foo-1.0.3-345",
+					Address: "localhost",
+					Port:    8888,
+				},
+			},
+		},
+	},
+}
 
 func (m *mockRegistry) init() {
 	// add some mock data
@@ -63,7 +60,6 @@ func (m *mockRegistry) GetService(service string) ([]*registry.Service, error) {
 		return nil, registry.ErrNotFound
 	}
 	return s, nil
-
 }
 
 func (m *mockRegistry) ListServices() ([]*registry.Service, error) {

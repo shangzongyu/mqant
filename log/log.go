@@ -16,12 +16,14 @@
 package log
 
 import (
-	beegolog "github.com/liangdas/mqant/log/beego"
-	mqanttools "github.com/liangdas/mqant/utils"
+	beegolog "github.com/shangzongyu/mqant/log/beego"
+	mqanttools "github.com/shangzongyu/mqant/utils"
 )
 
-var beego *beegolog.BeeLogger
-var bi *beegolog.BeeLogger
+var (
+	beego *beegolog.BeeLogger
+	bi    *beegolog.BeeLogger
+)
 
 // InitLog 初始化日志
 func InitLog(debug bool, ProcessID string, Logdir string, settings map[string]interface{}, logFilePath func(logdir, prefix, processID, suffix string) string) {
@@ -74,7 +76,7 @@ func CreateTrace(trace, span string) TraceSpan {
 
 // BiReport BiReport
 func BiReport(msg string) {
-	//gLogger.doPrintf(debugLevel, printDebugLevel, format, a...)
+	// gLogger.doPrintf(debugLevel, printDebugLevel, format, a...)
 	l := BiBeego()
 	if l != nil {
 		l.BiReport(msg)
@@ -83,25 +85,25 @@ func BiReport(msg string) {
 
 // Debug Debug
 func Debug(format string, a ...interface{}) {
-	//gLogger.doPrintf(debugLevel, printDebugLevel, format, a...)
+	// gLogger.doPrintf(debugLevel, printDebugLevel, format, a...)
 	LogBeego().Debug(nil, format, a...)
 }
 
 // Info Info
 func Info(format string, a ...interface{}) {
-	//gLogger.doPrintf(releaseLevel, printReleaseLevel, format, a...)
+	// gLogger.doPrintf(releaseLevel, printReleaseLevel, format, a...)
 	LogBeego().Info(nil, format, a...)
 }
 
 // Error Error
 func Error(format string, a ...interface{}) {
-	//gLogger.doPrintf(errorLevel, printErrorLevel, format, a...)
+	// gLogger.doPrintf(errorLevel, printErrorLevel, format, a...)
 	LogBeego().Error(nil, format, a...)
 }
 
 // Warning Warning
 func Warning(format string, a ...interface{}) {
-	//gLogger.doPrintf(fatalLevel, printFatalLevel, format, a...)
+	// gLogger.doPrintf(fatalLevel, printFatalLevel, format, a...)
 	LogBeego().Warning(nil, format, a...)
 }
 

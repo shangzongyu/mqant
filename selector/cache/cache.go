@@ -5,9 +5,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/liangdas/mqant/log"
-	"github.com/liangdas/mqant/registry"
-	"github.com/liangdas/mqant/selector"
+	"github.com/shangzongyu/mqant/log"
+	"github.com/shangzongyu/mqant/registry"
+	"github.com/shangzongyu/mqant/selector"
 )
 
 type cacheSelector struct {
@@ -26,9 +26,7 @@ type cacheSelector struct {
 	exit   chan bool
 }
 
-var (
-	DefaultTTL = time.Minute
-)
+var DefaultTTL = time.Minute
 
 func (c *cacheSelector) quit() bool {
 	select {
@@ -218,7 +216,7 @@ func (c *cacheSelector) update(res *registry.Result) {
 			if !seen {
 				nodes = append(nodes, cur)
 			} else {
-				//应该删除的
+				// 应该删除的
 				if c.Options().Watcher != nil {
 					c.Options().Watcher(cur)
 				}
@@ -285,7 +283,7 @@ func (c *cacheSelector) run(name string) {
 			if c.quit() {
 				return
 			}
-			//log.Warning("%v", err)
+			// log.Warning("%v", err)
 			continue
 		}
 	}

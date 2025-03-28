@@ -1,7 +1,7 @@
 package consul
 
 import (
-	"github.com/liangdas/mqant/registry"
+	"github.com/shangzongyu/mqant/registry"
 )
 
 func NewRegistry(opts ...registry.Option) registry.Registry {

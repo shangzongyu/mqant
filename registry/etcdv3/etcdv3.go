@@ -11,15 +11,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/liangdas/mqant/registry"
 	hash "github.com/mitchellh/hashstructure"
+	"github.com/shangzongyu/mqant/registry"
 	"go.etcd.io/etcd/clientv3"
 	"go.etcd.io/etcd/etcdserver/api/v3rpc/rpctypes"
 )
 
-var (
-	prefix = "/mqant-registry"
-)
+var prefix = "/mqant-registry"
 
 type etcdv3Registry struct {
 	client  *clientv3.Client
@@ -142,7 +140,7 @@ func (e *etcdv3Registry) Register(s *registry.Service, opts ...registry.Register
 	}
 
 	var leaseNotFound bool
-	//refreshing lease if existing
+	// refreshing lease if existing
 	leaseID, ok := e.leases[s.Name]
 	if ok {
 		if _, err := e.client.KeepAliveOnce(context.TODO(), leaseID); err != nil {

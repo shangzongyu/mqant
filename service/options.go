@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/liangdas/mqant/registry"
-	"github.com/liangdas/mqant/server"
+	"github.com/shangzongyu/mqant/registry"
+	"github.com/shangzongyu/mqant/server"
 )
 
 // Service Service
@@ -74,12 +74,12 @@ func Registry(r registry.Registry) Option {
 	return func(o *Options) {
 		o.Registry = r
 		// Update Client and Server
-		//o.Client.Init(client.Registry(r))
+		// o.Client.Init(client.Registry(r))
 		o.Server.Init(server.Registry(r))
 		// Update Selector
-		//o.Client.Options().Selector.Init(selector.Registry(r))
+		// o.Client.Options().Selector.Init(selector.Registry(r))
 		// Update Broker
-		//o.Broker.Init(broker.Registry(r))
+		// o.Broker.Init(broker.Registry(r))
 	}
 }
 

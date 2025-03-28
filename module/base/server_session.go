@@ -18,10 +18,10 @@ package basemodule
 import (
 	"context"
 
-	"github.com/liangdas/mqant/module"
-	"github.com/liangdas/mqant/registry"
-	mqrpc "github.com/liangdas/mqant/rpc"
-	defaultrpc "github.com/liangdas/mqant/rpc/base"
+	"github.com/shangzongyu/mqant/module"
+	"github.com/shangzongyu/mqant/registry"
+	mqrpc "github.com/shangzongyu/mqant/rpc"
+	defaultrpc "github.com/shangzongyu/mqant/rpc/base"
 )
 
 // NewServerSession 创建一个节点实例
@@ -54,9 +54,11 @@ func (c *serverSession) GetID() string {
 func (c *serverSession) GetId() string {
 	return c.node.Id
 }
+
 func (c *serverSession) GetName() string {
 	return c.name
 }
+
 func (c *serverSession) GetRPC() mqrpc.RPCClient {
 	return c.rpc
 }
@@ -69,6 +71,7 @@ func (c *serverSession) GetRpc() mqrpc.RPCClient {
 func (c *serverSession) GetApp() module.App {
 	return c.app
 }
+
 func (c *serverSession) GetNode() *registry.Node {
 	return c.node
 }

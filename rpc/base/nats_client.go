@@ -19,19 +19,19 @@ import (
 	"sync"
 	"time"
 
-	"github.com/liangdas/mqant/log"
-	"github.com/liangdas/mqant/module"
-	mqrpc "github.com/liangdas/mqant/rpc"
-	rpcpb "github.com/liangdas/mqant/rpc/pb"
-	mqanttools "github.com/liangdas/mqant/utils"
 	"github.com/nats-io/nats.go"
+	"github.com/shangzongyu/mqant/log"
+	"github.com/shangzongyu/mqant/module"
+	mqrpc "github.com/shangzongyu/mqant/rpc"
+	rpcpb "github.com/shangzongyu/mqant/rpc/pb"
+	mqanttools "github.com/shangzongyu/mqant/utils"
 	"google.golang.org/protobuf/proto"
 )
 
 type NatsClient struct {
-	//callinfos map[string]*ClinetCallInfo
+	// callinfos map[string]*ClinetCallInfo
 	callinfos         *mqanttools.BeeMap
-	cmutex            sync.Mutex //操作callinfos的锁
+	cmutex            sync.Mutex // 操作callinfos的锁
 	callbackqueueName string
 	app               module.App
 	done              chan error
@@ -56,6 +56,7 @@ func (c *NatsClient) Delete(key string) (err error) {
 	c.callinfos.Delete(key)
 	return
 }
+
 func (c *NatsClient) CloseFch(fch chan *rpcpb.ResultInfo) {
 	defer func() {
 		if recover() != nil {
@@ -65,17 +66,18 @@ func (c *NatsClient) CloseFch(fch chan *rpcpb.ResultInfo) {
 
 	close(fch) // panic if ch is closed
 }
-func (c *NatsClient) Done() (err error) {
-	//关闭amqp链接通道
-	//close(c.send_chan)
-	//c.send_done<-nil
 
-	//清理 callinfos 列表
+func (c *NatsClient) Done() (err error) {
+	// 关闭amqp链接通道
+	// close(c.send_chan)
+	// c.send_done<-nil
+
+	// 清理 callinfos 列表
 	for key, clinetCallInfo := range c.callinfos.Items() {
 		if clinetCallInfo != nil {
-			//关闭管道
+			// 关闭管道
 			c.CloseFch(clinetCallInfo.(ClinetCallInfo).call)
-			//从Map中删除
+			// 从Map中删除
 			c.callinfos.Delete(key)
 		}
 	}
@@ -90,12 +92,12 @@ func (c *NatsClient) Done() (err error) {
 消息请求
 */
 func (c *NatsClient) Call(callInfo *mqrpc.CallInfo, callback chan *rpcpb.ResultInfo) error {
-	//var err error
+	// var err error
 	if c.callinfos == nil {
 		return fmt.Errorf("AMQPClient is closed")
 	}
 	callInfo.RPCInfo.ReplyTo = c.callbackqueueName
-	var correlation_id = callInfo.RPCInfo.Cid
+	correlation_id := callInfo.RPCInfo.Cid
 
 	clinetCallInfo := &ClinetCallInfo{
 		correlation_id: correlation_id,
@@ -129,7 +131,7 @@ func (c *NatsClient) CallNR(callInfo *mqrpc.CallInfo) error {
 func (c *NatsClient) on_request_handle() (err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			var rn = ""
+			rn := ""
 			switch r.(type) {
 
 			case string:
@@ -157,10 +159,10 @@ func (c *NatsClient) on_request_handle() (err error) {
 	for !c.isClose {
 		m, err := c.subs.NextMsg(time.Minute)
 		if err != nil && err == nats.ErrTimeout {
-			//fmt.Println(err.Error())
-			//log.Warning("NatsServer error with '%v'",err)
+			// fmt.Println(err.Error())
+			// log.Warning("NatsServer error with '%v'",err)
 			if !c.subs.IsValid() {
-				//订阅已关闭，需要重新订阅
+				// 订阅已关闭，需要重新订阅
 				c.subs, err = c.app.Transport().SubscribeSync(c.callbackqueueName)
 				if err != nil {
 					log.Error("NatsClient SubscribeSync[1] error with '%v'", err)
@@ -172,7 +174,7 @@ func (c *NatsClient) on_request_handle() (err error) {
 			fmt.Println(fmt.Sprintf("%v rpcclient error: %v", time.Now().String(), err.Error()))
 			log.Error("NatsClient error with '%v'", err)
 			if !c.subs.IsValid() {
-				//订阅已关闭，需要重新订阅
+				// 订阅已关闭，需要重新订阅
 				c.subs, err = c.app.Transport().SubscribeSync(c.callbackqueueName)
 				if err != nil {
 					log.Error("NatsClient SubscribeSync[2] error with '%v'", err)
@@ -188,7 +190,7 @@ func (c *NatsClient) on_request_handle() (err error) {
 		} else {
 			correlation_id := resultInfo.Cid
 			clinetCallInfo := c.callinfos.Get(correlation_id)
-			//删除
+			// 删除
 			c.callinfos.Delete(correlation_id)
 			if clinetCallInfo != nil {
 				if clinetCallInfo.(ClinetCallInfo).call != nil {
@@ -196,7 +198,7 @@ func (c *NatsClient) on_request_handle() (err error) {
 					c.CloseFch(clinetCallInfo.(ClinetCallInfo).call)
 				}
 			} else {
-				//可能客户端已超时了，但服务端处理完还给回调了
+				// 可能客户端已超时了，但服务端处理完还给回调了
 				log.Warning("rpc callback no found : [%s]", correlation_id)
 			}
 		}
@@ -206,8 +208,8 @@ func (c *NatsClient) on_request_handle() (err error) {
 }
 
 func (c *NatsClient) UnmarshalResult(data []byte) (*rpcpb.ResultInfo, error) {
-	//fmt.Println(msg)
-	//保存解码后的数据，Value可以为任意数据类型
+	// fmt.Println(msg)
+	// 保存解码后的数据，Value可以为任意数据类型
 	var resultInfo rpcpb.ResultInfo
 	err := proto.Unmarshal(data, &resultInfo)
 	if err != nil {
@@ -218,8 +220,8 @@ func (c *NatsClient) UnmarshalResult(data []byte) (*rpcpb.ResultInfo, error) {
 }
 
 func (c *NatsClient) Unmarshal(data []byte) (*rpcpb.RPCInfo, error) {
-	//fmt.Println(msg)
-	//保存解码后的数据，Value可以为任意数据类型
+	// fmt.Println(msg)
+	// 保存解码后的数据，Value可以为任意数据类型
 	var rpcInfo rpcpb.RPCInfo
 	err := proto.Unmarshal(data, &rpcInfo)
 	if err != nil {
@@ -233,7 +235,7 @@ func (c *NatsClient) Unmarshal(data []byte) (*rpcpb.RPCInfo, error) {
 
 // goroutine safe
 func (c *NatsClient) Marshal(rpcInfo *rpcpb.RPCInfo) ([]byte, error) {
-	//map2:= structs.Map(callInfo)
+	// map2:= structs.Map(callInfo)
 	b, err := proto.Marshal(rpcInfo)
 	return b, err
 }

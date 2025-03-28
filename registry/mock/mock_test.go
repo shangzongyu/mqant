@@ -3,82 +3,80 @@ package mock
 import (
 	"testing"
 
-	"github.com/liangdas/mqant/registry"
+	"github.com/shangzongyu/mqant/registry"
 )
 
-var (
-	testData = map[string][]*registry.Service{
-		"foo": []*registry.Service{
-			{
-				Name:    "foo",
-				Version: "1.0.0",
-				Nodes: []*registry.Node{
-					{
-						Id:      "foo-1.0.0-123",
-						Address: "localhost",
-						Port:    9999,
-					},
-					{
-						Id:      "foo-1.0.0-321",
-						Address: "localhost",
-						Port:    9999,
-					},
+var testData = map[string][]*registry.Service{
+	"foo": {
+		{
+			Name:    "foo",
+			Version: "1.0.0",
+			Nodes: []*registry.Node{
+				{
+					Id:      "foo-1.0.0-123",
+					Address: "localhost",
+					Port:    9999,
 				},
-			},
-			{
-				Name:    "foo",
-				Version: "1.0.1",
-				Nodes: []*registry.Node{
-					{
-						Id:      "foo-1.0.1-321",
-						Address: "localhost",
-						Port:    6666,
-					},
-				},
-			},
-			{
-				Name:    "foo",
-				Version: "1.0.3",
-				Nodes: []*registry.Node{
-					{
-						Id:      "foo-1.0.3-345",
-						Address: "localhost",
-						Port:    8888,
-					},
+				{
+					Id:      "foo-1.0.0-321",
+					Address: "localhost",
+					Port:    9999,
 				},
 			},
 		},
-		"bar": []*registry.Service{
-			{
-				Name:    "bar",
-				Version: "default",
-				Nodes: []*registry.Node{
-					{
-						Id:      "bar-1.0.0-123",
-						Address: "localhost",
-						Port:    9999,
-					},
-					{
-						Id:      "bar-1.0.0-321",
-						Address: "localhost",
-						Port:    9999,
-					},
-				},
-			},
-			{
-				Name:    "bar",
-				Version: "latest",
-				Nodes: []*registry.Node{
-					{
-						Id:      "bar-1.0.1-321",
-						Address: "localhost",
-						Port:    6666,
-					},
+		{
+			Name:    "foo",
+			Version: "1.0.1",
+			Nodes: []*registry.Node{
+				{
+					Id:      "foo-1.0.1-321",
+					Address: "localhost",
+					Port:    6666,
 				},
 			},
 		},
-	}
-)
+		{
+			Name:    "foo",
+			Version: "1.0.3",
+			Nodes: []*registry.Node{
+				{
+					Id:      "foo-1.0.3-345",
+					Address: "localhost",
+					Port:    8888,
+				},
+			},
+		},
+	},
+	"bar": {
+		{
+			Name:    "bar",
+			Version: "default",
+			Nodes: []*registry.Node{
+				{
+					Id:      "bar-1.0.0-123",
+					Address: "localhost",
+					Port:    9999,
+				},
+				{
+					Id:      "bar-1.0.0-321",
+					Address: "localhost",
+					Port:    9999,
+				},
+			},
+		},
+		{
+			Name:    "bar",
+			Version: "latest",
+			Nodes: []*registry.Node{
+				{
+					Id:      "bar-1.0.1-321",
+					Address: "localhost",
+					Port:    6666,
+				},
+			},
+		},
+	},
+}
 
 func TestMockRegistry(t *testing.T) {
 	m := NewRegistry()
@@ -123,7 +121,6 @@ func TestMockRegistry(t *testing.T) {
 
 	// using test data
 	for k, v := range testData {
-
 		fn(k, v)
 	}
 
