@@ -6,13 +6,13 @@ require (
 	github.com/hashicorp/consul/api v1.31.2
 	github.com/json-iterator/go v1.1.12
 	github.com/mitchellh/hashstructure v1.1.0
-	github.com/nats-io/nats.go v1.39.1
+	github.com/nats-io/nats.go v1.40.1
 	github.com/pborman/uuid v1.2.1
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.10.0
 	go.etcd.io/etcd v2.3.8+incompatible
-	golang.org/x/net v0.37.0
-	google.golang.org/protobuf v1.36.5
+	golang.org/x/net v0.38.0
+	google.golang.org/protobuf v1.36.6
 )
 
 require (
@@ -29,7 +29,7 @@ require (
 	github.com/hashicorp/go-rootcerts v1.0.2 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/hashicorp/serf v0.10.1 // indirect
-	github.com/klauspost/compress v1.17.9 // indirect
+	github.com/klauspost/compress v1.18.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect

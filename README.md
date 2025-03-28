@@ -37,9 +37,8 @@ mqant 是一款基于 Golang 语言的简洁，高效，高性能的分布式微
 ## 演示示例
 
 - mqant 项目只包含 mqant 的代码文件
-- mqantserver 项目包括了完整的测试demo代码和 mqant 所依赖的库
+- mqantserver 项目包括了完整的测试 demo 代码和 mqant 所依赖的库
 - 如果你是新手可以优先下载 mqantserver 项目进行试验
-
 
 [在线 Demo 演示](http://www.mqant.com/mqant/chat/)【[源码下载](https://github.com/shangzongyu/mqantserver)】
 

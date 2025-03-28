@@ -178,7 +178,7 @@ func NewApp(opts ...module.Option) module.App {
 	app := new(DefaultApp)
 	app.opts = options
 	options.Selector.Init(selector.SetWatcher(app.Watcher))
-	app.rpcserializes = map[string]module.RPCSerialize{}
+	app.rpcSerializes = map[string]module.RPCSerialize{}
 	return app
 }
 
@@ -192,7 +192,7 @@ type DefaultApp struct {
 	defaultRoutes func(app module.App, Type string, hash string) module.ServerSession
 	// 将一个RPC调用路由到新的路由上
 	mapRoute            func(app module.App, route string) string
-	rpcserializes       map[string]module.RPCSerialize
+	rpcSerializes       map[string]module.RPCSerialize
 	configurationLoaded func(app module.App)
 	startup             func(app module.App)
 	moduleInited        func(app module.App, module module.Module)
@@ -280,10 +280,10 @@ func (app *DefaultApp) SetMapRoute(fn func(app module.App, route string) string)
 
 // AddRPCSerialize AddRPCSerialize
 func (app *DefaultApp) AddRPCSerialize(name string, Interface module.RPCSerialize) error {
-	if _, ok := app.rpcserializes[name]; ok {
+	if _, ok := app.rpcSerializes[name]; ok {
 		return fmt.Errorf("The name(%s) has been occupied", name)
 	}
-	app.rpcserializes[name] = Interface
+	app.rpcSerializes[name] = Interface
 	return nil
 }
 
@@ -304,7 +304,7 @@ func (app *DefaultApp) Registry() registry.Registry {
 
 // GetRPCSerialize GetRPCSerialize
 func (app *DefaultApp) GetRPCSerialize() map[string]module.RPCSerialize {
-	return app.rpcserializes
+	return app.rpcSerializes
 }
 
 // Watcher Watcher
