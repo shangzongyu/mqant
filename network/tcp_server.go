@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package network tcp服务器
+// Package network TCP 服务器
 package network
 
 import (
@@ -24,7 +24,7 @@ import (
 	"github.com/liangdas/mqant/log"
 )
 
-// TCPServer tcp服务器
+// TCPServer TCP 服务器
 type TCPServer struct {
 	Addr       string
 	TLS        bool //是否支持tls
@@ -38,10 +38,12 @@ type TCPServer struct {
 	wgConns    sync.WaitGroup
 }
 
-// Start 开始tcp监听
+// Start 开始 TCP 监听
 func (server *TCPServer) Start() {
 	server.init()
+
 	log.Info("TCP Listen :%s", server.Addr)
+
 	go server.run()
 }
 
@@ -107,7 +109,7 @@ func (server *TCPServer) run() {
 	}
 }
 
-// Close 关闭TCP监听
+// Close 关闭 TCP 监听
 func (server *TCPServer) Close() {
 	server.ln.Close()
 	server.wgLn.Wait()

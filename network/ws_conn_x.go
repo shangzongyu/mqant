@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package network websocket连接器
+// Package network websocket 连接器
 package network
 
 import (
@@ -34,7 +34,7 @@ type Addr struct {
 func (addr *Addr) Network() string { return "websocket" }
 func (addr *Addr) String() string  { return addr.ip }
 
-// WSConn websocket连接
+// WSConn websocket 连接
 type WSConn struct {
 	io.Reader //Read(p []byte) (n int, err error)
 	io.Writer //Write(p []byte) (n int, err error)
@@ -89,12 +89,12 @@ func (wsConn *WSConn) Read(p []byte) (n int, err error) {
 	return wsConn.conn.Read(p)
 }
 
-// LocalAddr 获取本地socket地址
+// LocalAddr 获取本地 socket 地址
 func (wsConn *WSConn) LocalAddr() net.Addr {
 	return wsConn.conn.LocalAddr()
 }
 
-// RemoteAddr 获取远程socket地址
+// RemoteAddr 获取远程 socket 地址
 func (wsConn *WSConn) RemoteAddr() net.Addr {
 	return &Addr{ip: iptool.RealIP(wsConn.conn.Request())}
 }

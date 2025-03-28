@@ -14,10 +14,10 @@ import (
 	"golang.org/x/net/websocket"
 )
 
-// WSServer websocket服务器
+// WSServer websocket 服务器
 type WSServer struct {
 	Addr        string
-	TLS         bool //是否支持tls
+	TLS         bool // 是否支持 tls
 	CertFile    string
 	KeyFile     string
 	MaxConnNum  int

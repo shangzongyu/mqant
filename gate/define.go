@@ -80,11 +80,11 @@ type Session interface {
 	SetUserId(userid string)
 	SetUserID(userid string)
 	// Deprecated: 因为命名规范问题函数将废弃,请用SetSessionID代替
-	SetSessionId(sessionid string)
-	SetSessionID(sessionid string)
+	SetSessionId(sessionId string)
+	SetSessionID(sessionId string)
 	// Deprecated: 因为命名规范问题函数将废弃,请用SetServerId代替
-	SetServerId(serverid string)
-	SetServerID(serverid string)
+	SetServerId(serverId string)
+	SetServerID(serverId string)
 	SetSettings(settings map[string]string)
 	CloneSettings() map[string]string
 	SetLocalKV(key, value string) error
@@ -105,7 +105,7 @@ type Session interface {
 	Remove(key string) (err string)
 	Send(topic string, body []byte) (err string)
 	SendNR(topic string, body []byte) (err string)
-	SendBatch(Sessionids string, topic string, body []byte) (int64, string) // 想该客户端的网关批量发送消息
+	SendBatch(sessionIds string, topic string, body []byte) (int64, string) // 想该客户端的网关批量发送消息
 	// IsConnect 查询某一个 userId 是否连接中，这里只是查询这一个网关里面是否有 userId 客户端连接，如果有多个网关就需要遍历了
 	IsConnect(userId string) (result bool, err string)
 	// IsGuest 是否是访客(未登录) ,默认判断规则为 userId==""代表访客
@@ -158,8 +158,8 @@ type AgentLearner interface {
 
 // SessionLearner 客户端代理
 type SessionLearner interface {
-	Connect(s Session)    //当连接建立，并且 MQTT 协议握手成功
-	DisConnect(s Session) //当连接关闭或者客户端主动发送 MQTT DisConnect命令
+	Connect(s Session)    // 当连接建立，并且 MQTT 协议握手成功
+	DisConnect(s Session) // 当连接关闭或者客户端主动发送 MQTT DisConnect命令
 }
 
 // Agent 客户端代理定义

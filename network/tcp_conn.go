@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package network tcp网络控制器
+// Package network tcp 网络控制器
 package network
 
 import (

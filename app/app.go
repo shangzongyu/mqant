@@ -228,8 +228,9 @@ func (app *DefaultApp) Run(mods ...module.Module) error {
 
 	manager := basemodule.NewModuleManager()
 	manager.RegisterRunMod(modules.TimerModule()) //注册时间轮模块 每一个进程都默认运行
+
 	// module
-	for i := 0; i < len(mods); i++ {
+	for i := range mods {
 		mods[i].OnAppConfigurationLoaded(app)
 		manager.Register(mods[i])
 	}

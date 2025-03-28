@@ -51,19 +51,19 @@ func (s *Server) OnInit(app module.App, settings *conf.ModuleSettings) {
 
 // Run() 运行服务
 func (s *Server) Run(closeSig chan bool) {
-	//创建MongoDB连接实例
+	// 创建MongoDB连接实例
 }
 
 // 销毁服务
 func (s *Server) OnDestroy() {
-	//一定别忘了继承
+	// 一定别忘了继承
 	s.BaseModule.OnDestroy()
 	s.GetServer().OnDestroy()
 }
 
 // Version() 获取当前服务的代码版本
 func (s *Server) Version() string {
-	//可以在监控时了解代码版本
+	// 可以在监控时了解代码版本
 	return s.version
 }
 

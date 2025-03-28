@@ -8,8 +8,7 @@ import (
 	basemodule "github.com/liangdas/mqant/module/base"
 )
 
-type Greeter struct {
-}
+type Greeter struct{}
 
 func (g *Greeter) Hello(in *greeter.Request) (out *greeter.Response, err error) {
 	out = &greeter.Response{
@@ -17,18 +16,18 @@ func (g *Greeter) Hello(in *greeter.Request) (out *greeter.Response, err error) 
 	}
 	return
 }
+
 func (g *Greeter) Stream(in *greeter.Request) (out *greeter.Response, err error) {
 	return
 }
-func main() {
 
+func main() {
 	// 服务实例
 	app := mqant.CreateApp(
 		module.Debug(false),
 	)
 	// 配置加载
 	app.OnConfigurationLoaded(func(app module.App) {
-
 	})
 	s := &Server{}
 	app.Run(s)
@@ -55,19 +54,19 @@ func (s *Server) OnInit(app module.App, settings *conf.ModuleSettings) {
 
 // Run() 运行服务
 func (s *Server) Run(closeSig chan bool) {
-	//创建MongoDB连接实例
+	// 创建MongoDB连接实例
 }
 
 // 销毁服务
 func (s *Server) OnDestroy() {
-	//一定别忘了继承
+	// 一定别忘了继承
 	s.BaseModule.OnDestroy()
 	s.GetServer().OnDestroy()
 }
 
 // Version() 获取当前服务的代码版本
 func (s *Server) Version() string {
-	//可以在监控时了解代码版本
+	// 可以在监控时了解代码版本
 	return s.version
 }
 
