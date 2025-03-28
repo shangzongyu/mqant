@@ -17,10 +17,11 @@ package mqanttools
 
 import "math/rand"
 
-// RandInt64 生成一个min->max的随机数
+// RandInt64 生成一个 min->max 的随机数
 func RandInt64(min, max int64) int64 {
-	if min >= max {
-		return max
-	}
-	return rand.Int63n(max-min) + min
+    if min >= max {
+        return max
+    }
+
+    return rand.Int63n(max-min) + min
 }

@@ -144,8 +144,7 @@ func (m *BaseModule) OnInit(subclass module.RPCModule, app module.App, settings 
 	)
 
 	go func() {
-		err := m.service.Run()
-		if err != nil {
+		if err := m.service.Run(); err != nil {
 			log.Warning("service run fail id(%s) error(%s)", m.GetServerID(), err)
 		}
 		close(m.serviceStopeds)
@@ -165,7 +164,7 @@ func (m *BaseModule) OnDestroy() {
 	_ = m.GetServer().OnDestroy()
 }
 
-// SetListener  mqrpc.RPCListener
+// SetListener mqrpc.RPCListener
 func (m *BaseModule) SetListener(listener mqrpc.RPCListener) {
 	m.listener = listener
 }
@@ -185,66 +184,30 @@ func (m *BaseModule) Invoke(moduleType string, _func string, params ...interface
 	return m.App.Invoke(m.GetSubclass(), moduleType, _func, params...)
 }
 
-// RpcInvoke  RpcInvoke
-// Deprecated: 因为命名规范问题函数将废弃,请用Invoke代替
-func (m *BaseModule) RpcInvoke(moduleType string, _func string, params ...interface{}) (result interface{}, err string) {
-	return m.App.Invoke(m.GetSubclass(), moduleType, _func, params...)
-}
-
-// InvokeNR  InvokeNR
-func (m *BaseModule) InvokeNR(moduleType string, _func string, params ...interface{}) (err error) {
-	return m.App.InvokeNR(m.GetSubclass(), moduleType, _func, params...)
-}
-
-// RpcInvokeNR  RpcInvokeNR
-// Deprecated: 因为命名规范问题函数将废弃,请用InvokeNR代替
-func (m *BaseModule) RpcInvokeNR(moduleType string, _func string, params ...interface{}) (err error) {
-	return m.App.InvokeNR(m.GetSubclass(), moduleType, _func, params...)
-}
-
 // InvokeArgs  InvokeArgs
 func (m *BaseModule) InvokeArgs(moduleType string, _func string, ArgsType []string, args [][]byte) (result interface{}, err string) {
-	server, e := m.App.GetRouteServer(moduleType)
+	routeServer, e := m.App.GetRouteServer(moduleType)
 	if e != nil {
 		err = e.Error()
 		return
 	}
-	return server.CallArgs(nil, _func, ArgsType, args)
-}
-
-// RpcInvokeArgs  RpcInvokeArgs
-// Deprecated: 因为命名规范问题函数将废弃,请用RpcInvokeArgs代替
-func (m *BaseModule) RpcInvokeArgs(moduleType string, _func string, ArgsType []string, args [][]byte) (result interface{}, err string) {
-	return m.InvokeArgs(moduleType, _func, ArgsType, args)
+	return routeServer.CallArgs(nil, _func, ArgsType, args)
 }
 
 // InvokeNRArgs  InvokeNRArgs
 func (m *BaseModule) InvokeNRArgs(moduleType string, _func string, ArgsType []string, args [][]byte) (err error) {
-	server, err := m.App.GetRouteServer(moduleType)
+	routeServer, err := m.App.GetRouteServer(moduleType)
 	if err != nil {
 		return
 	}
-	return server.CallNRArgs(_func, ArgsType, args)
+	return routeServer.CallNRArgs(_func, ArgsType, args)
 }
 
-// RpcInvokeNRArgs  RpcInvokeNRArgs
-// Deprecated: 因为命名规范问题函数将废弃,请用InvokeNRArgs代替
-func (m *BaseModule) RpcInvokeNRArgs(moduleType string, _func string, ArgsType []string, args [][]byte) (err error) {
-	return m.InvokeNRArgs(moduleType, _func, ArgsType, args)
-}
-
-// Call  Call
 func (m *BaseModule) Call(ctx context.Context, moduleType, _func string, param mqrpc.ParamOption, opts ...selector.SelectOption) (interface{}, string) {
 	return m.App.Call(ctx, moduleType, _func, param, opts...)
 }
 
-// RpcCall  RpcCall
-// Deprecated: 因为命名规范问题函数将废弃,请用Call代替
-func (m *BaseModule) RpcCall(ctx context.Context, moduleType, _func string, param mqrpc.ParamOption, opts ...selector.SelectOption) (interface{}, string) {
-	return m.App.Call(ctx, moduleType, _func, param, opts...)
-}
-
-// NoFoundFunction  当hander未找到时调用
+// NoFoundFunction  当 hander 未找到时调用
 func (m *BaseModule) NoFoundFunction(fn string) (*mqrpc.FunctionInfo, error) {
 	if m.listener != nil {
 		return m.listener.NoFoundFunction(fn)
@@ -252,7 +215,7 @@ func (m *BaseModule) NoFoundFunction(fn string) (*mqrpc.FunctionInfo, error) {
 	return nil, errors.Errorf("Remote function(%s) not found", fn)
 }
 
-// BeforeHandle  hander执行前调用
+// BeforeHandle 执行前调用
 func (m *BaseModule) BeforeHandle(fn string, callInfo *mqrpc.CallInfo) error {
 	if m.listener != nil {
 		return m.listener.BeforeHandle(fn, callInfo)
@@ -260,21 +223,21 @@ func (m *BaseModule) BeforeHandle(fn string, callInfo *mqrpc.CallInfo) error {
 	return nil
 }
 
-// OnTimeOut  hander执行超时调用
+// OnTimeOut  执行超时调用
 func (m *BaseModule) OnTimeOut(fn string, Expired int64) {
 	if m.listener != nil {
 		m.listener.OnTimeOut(fn, Expired)
 	}
 }
 
-// OnError  hander执行错误调用
+// OnError 执行错误调用
 func (m *BaseModule) OnError(fn string, callInfo *mqrpc.CallInfo, err error) {
 	if m.listener != nil {
 		m.listener.OnError(fn, callInfo, err)
 	}
 }
 
-// OnComplete hander成功执行完成时调用
+// OnComplete 成功执行完成时调用
 // fn 		方法名
 // params		参数
 // result		执行结果

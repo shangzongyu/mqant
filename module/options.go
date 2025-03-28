@@ -50,7 +50,7 @@ type ClientRPCHandler func(app App, server registry.Node, rpcinfo *rpcpb.RPCInfo
 // ServerRPCHandler 服务方RPC监控
 type ServerRPCHandler func(app App, module Module, callInfo *mqrpc.CallInfo)
 
-// ServerRPCHandler 服务方RPC监控
+// RpcCompleteHandler 服务方RPC监控
 type RpcCompleteHandler func(app App, module Module, callInfo *mqrpc.CallInfo, input []interface{}, out []interface{}, execTime time.Duration)
 
 // Version 应用版本
@@ -160,28 +160,28 @@ func SetServerRPCHandler(t ServerRPCHandler) Option {
 	}
 }
 
-// SetServerRPCCompleteHandler 服务RPC执行结果监控器
+// SetRpcCompleteHandler  服务RPC执行结果监控器
 func SetRpcCompleteHandler(t RpcCompleteHandler) Option {
 	return func(o *Options) {
 		o.RpcCompleteHandler = t
 	}
 }
 
-// Parse mqant框架是否解析环境参数
+// Parse mqant 框架是否解析环境参数
 func Parse(t bool) Option {
 	return func(o *Options) {
 		o.Parse = t
 	}
 }
 
-// RPC超时时间
+// RPCExpired RPC 超时时间
 func RPCExpired(t time.Duration) Option {
 	return func(o *Options) {
 		o.RPCExpired = t
 	}
 }
 
-// 单个节点RPC同时并发协程数
+// RPCMaxCoroutine 单个节点RPC同时并发协程数
 func RPCMaxCoroutine(t int) Option {
 	return func(o *Options) {
 		o.RPCMaxCoroutine = t

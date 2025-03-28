@@ -10,11 +10,12 @@ func wait(ctx context.Context) bool {
 	if ctx == nil {
 		return false
 	}
-	wait, ok := ctx.Value("wait").(bool)
+	w, ok := ctx.Value("wait").(bool)
 	if !ok {
 		return false
 	}
-	return wait
+
+	return w
 }
 
 // FromContext FromContext
@@ -23,7 +24,7 @@ func FromContext(ctx context.Context) (Server, bool) {
 	return c, ok
 }
 
-// NewContext NewContext
+// NewContext new content
 func NewContext(ctx context.Context, s Server) context.Context {
 	return context.WithValue(ctx, serverKey{}, s)
 }

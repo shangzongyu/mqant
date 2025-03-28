@@ -34,11 +34,6 @@ import (
 	mqanttools "github.com/shangzongyu/mqant/utils"
 )
 
-//type resultInfo struct {
-//	Error  string      //错误结果 如果为nil表示请求正确
-//	Result interface{} //rpc 返回结果
-//}
-
 type agent struct {
 	gate.Agent
 	module                       module.RPCModule
@@ -49,8 +44,8 @@ type agent struct {
 	gate                         gate.Gate
 	client                       *mqtt.Client
 	ch                           chan int // 控制模块可同时开启的最大协程数
-	isclose                      bool
-	protocol_ok                  bool
+	isClose                      bool
+	protocolOk                   bool
 	lock                         sync.Mutex
 	lastStorageHeartbeatDataTime time.Duration // 上一次发送存储心跳时间
 	revNum                       int64
@@ -71,8 +66,8 @@ func (age *agent) OnInit(gate gate.Gate, conn network.Conn) error {
 	age.gate = gate
 	age.r = bufio.NewReaderSize(conn, gate.Options().BufSize)
 	age.w = bufio.NewWriterSize(conn, gate.Options().BufSize)
-	age.isclose = false
-	age.protocol_ok = false
+	age.isClose = false
+	age.protocolOk = false
 	age.revNum = 0
 	age.sendNum = 0
 	age.lastStorageHeartbeatDataTime = time.Duration(time.Now().UnixNano())
@@ -80,11 +75,11 @@ func (age *agent) OnInit(gate gate.Gate, conn network.Conn) error {
 }
 
 func (age *agent) IsClosed() bool {
-	return age.isclose
+	return age.isClose
 }
 
 func (age *agent) ProtocolOK() bool {
-	return age.protocol_ok
+	return age.protocolOk
 }
 
 func (age *agent) GetSession() gate.Session {
@@ -97,8 +92,8 @@ func (age *agent) Wait() error {
 	case age.ch <- 1:
 	// do nothing
 	default:
-		// warnning!
-		return fmt.Errorf("the work queue is full!")
+		// warning!
+		return fmt.Errorf("the work queue is full")
 	}
 	return nil
 }
@@ -145,7 +140,7 @@ func (age *agent) Run() (err error) {
 		return
 	}
 	if pack.GetType() != mqtt.CONNECT {
-		log.Error("Recive login pack's type error:%v \n", pack.GetType())
+		log.Error("Receive login pack's type error:%v \n", pack.GetType())
 		return
 	}
 	conn, ok := (pack.GetVariable()).(*mqtt.Connect)
@@ -184,9 +179,9 @@ func (age *agent) Run() (err error) {
 		return
 	}
 	age.connTime = time.Now()
-	age.protocol_ok = true
+	age.protocolOk = true
 	age.gate.GetAgentLearner().Connect(age) // 发送连接成功的事件
-	c.Listen_loop()                         // 开始监听,直到连接中断
+	c.ListenLoop()                          // 开始监听,直到连接中断
 	return nil
 }
 
@@ -198,7 +193,7 @@ func (age *agent) OnClose() error {
 			log.Error("agent OnClose panic(%v)\n info:%s", err, string(buff))
 		}
 	}()
-	age.isclose = true
+	age.isClose = true
 	age.gate.GetAgentLearner().DisConnect(age) // 发送连接断开的事件
 	return nil
 }
@@ -226,7 +221,7 @@ func (age *agent) OnRecover(pack *mqtt.Pack) {
 		pub := pack.GetVariable().(*mqtt.Publish)
 		age.toResult(age, *pub.GetTopic(), nil, err.Error())
 	} else {
-		go age.recoverworker(pack)
+		go age.recoverWorker(pack)
 	}
 }
 
@@ -246,7 +241,7 @@ func (age *agent) toResult(a *agent, Topic string, Result interface{}, Error str
 	return a.WriteMsg(Topic, br.GetData())
 }
 
-func (age *agent) recoverworker(pack *mqtt.Pack) {
+func (age *agent) recoverWorker(pack *mqtt.Pack) {
 	defer func() {
 		age.lock.Lock()
 		interval := int64(age.lastStorageHeartbeatDataTime) + int64(age.gate.Options().Heartbeat) // 单位纳秒
@@ -263,7 +258,7 @@ func (age *agent) recoverworker(pack *mqtt.Pack) {
 		if r := recover(); r != nil {
 			buff := make([]byte, 1024)
 			runtime.Stack(buff, false)
-			log.Error("Gate recoverworker error [%v] stack : %v", r, string(buff))
+			log.Error("Gate recover worker error [%v] stack : %v", r, string(buff))
 		}
 	}()
 

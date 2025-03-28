@@ -113,8 +113,8 @@ func (server *WSServer) Start() {
 			} else {
 				scheme = "ws"
 			}
-			real_ip := iptool.RealIP(r)
-			config.Origin, _ = url.ParseRequestURI(scheme + "://" + real_ip + r.URL.RequestURI())
+			realIp := iptool.RealIP(r)
+			config.Origin, _ = url.ParseRequestURI(scheme + "://" + realIp + r.URL.RequestURI())
 			offeredProtocol := r.Header.Get("Sec-WebSocket-Protocol")
 			ptls := strings.Split(offeredProtocol, ",")
 			if len(ptls) > 0 {

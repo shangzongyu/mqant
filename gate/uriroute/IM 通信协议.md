@@ -8,16 +8,14 @@
 
 ### mqtt协议
 
-基于tcp,websocket长连接
+基于 tcp,websocket 长连接
 
 1. 消息下发
 
-
 ### mqtt协议的使用
 
-mqant只用了mqtt 3.1版本的协议,目前主流开发语言都有相应的客户端开发库。
-
-mqant只用到了mqtt的【发布消息】协议，订阅协议未支持
+- mqant 只用了mqtt 3.1版本的协议,目前主流开发语言都有相应的客户端开发库。
+- mqant 只用到了mqtt的【发布消息】协议，订阅协议未支持
 
 ### mqtt协议简介
 
@@ -76,23 +74,12 @@ im模块中topic被限定为标准的URI格式
 4. 业务模块
 
     1. scheme  用于指定mqant后端微服务的模块ID
-
     2. hostname 用于指定业务模块节点路由规则
-
         >业务模块可能有多个节点
-
-        1. modulus
-
-            取模
-        2. cache
-
-            缓存
-        3. random
-
-            随机
-        4. 其他规则
-
-            例如节点ID
+        1. modulus 取模
+        2. cache  缓存
+        3. random 随机
+        4. 其他规则 例如节点ID
 
     eg.
 

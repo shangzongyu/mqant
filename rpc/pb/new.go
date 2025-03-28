@@ -1,7 +1,7 @@
 package rpcpb
 
 import (
-	proto "google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/proto"
 )
 
 func NewResultInfo(Cid string, Error string, ArgsType string, result []byte) *ResultInfo {
@@ -11,5 +11,6 @@ func NewResultInfo(Cid string, Error string, ArgsType string, result []byte) *Re
 		ResultType: *proto.String(ArgsType),
 		Result:     result,
 	}
+
 	return resultInfo
 }

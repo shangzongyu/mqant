@@ -13,7 +13,7 @@ import (
 
 func RequestToProto(r *http.Request) (*api.Request, error) {
 	if err := r.ParseForm(); err != nil {
-		return nil, fmt.Errorf("Error parsing form: %v", err)
+		return nil, fmt.Errorf("error parsing form: %v", err)
 	}
 
 	req := &api.Request{

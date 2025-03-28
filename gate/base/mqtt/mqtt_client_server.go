@@ -53,8 +53,8 @@ func NewClient(conf conf.Mqtt, recover PackRecover, r *bufio.Reader, w *bufio.Wr
 	return client
 }
 
-// Push the msg and response the heart beat
-func (c *Client) Listen_loop() (e error) {
+// ListenLoop Push the msg and response the heart beat
+func (c *Client) ListenLoop() (e error) {
 	defer func() {
 		if r := recover(); r != nil {
 		}

@@ -43,7 +43,7 @@ type GateHandler interface {
 	Send(span log.TraceSpan, sessionId string, topic string, body []byte) (result interface{}, err string) // Send message
 	SendBatch(span log.TraceSpan, Sessionids string, topic string, body []byte) (int64, string)            // 批量发送
 	BroadCast(span log.TraceSpan, topic string, body []byte) (int64, string)                               // 广播消息给网关所有在连客户端
-	// 查询某一个 userId 是否连接中，这里只是查询这一个网关里面是否有 userId 客户端连接，如果有多个网关就需要遍历了
+	// IsConnect 查询某一个 userId 是否连接中，这里只是查询这一个网关里面是否有 userId 客户端连接，如果有多个网关就需要遍历了
 	IsConnect(span log.TraceSpan, sessionId string, userId string) (result bool, err string)
 	Close(span log.TraceSpan, sessionId string) (result interface{}, err string) // 主动关闭连接
 	Update(span log.TraceSpan, sessionId string) (result Session, err string)    // 更新整个 Session 通常是其他模块拉取最新数据

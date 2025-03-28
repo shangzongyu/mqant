@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 package aes
 
 import (
@@ -22,7 +23,7 @@ import (
 func NewAesEncrypt(key string) (aes *AesEncrypt, err error) {
 	keyLen := len(key)
 	if keyLen < 16 {
-		err = fmt.Errorf("The length of res key shall not be less than 16")
+		err = fmt.Errorf("the length of res key shall not be less than 16")
 		return
 	}
 	aes = &AesEncrypt{

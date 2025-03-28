@@ -29,7 +29,7 @@ import (
 )
 
 type NatsClient struct {
-	// callinfos map[string]*ClinetCallInfo
+	// callinfos map[string]*ClientCallInfo
 	callinfos         *mqanttools.BeeMap
 	cmutex            sync.Mutex // 操作callinfos的锁
 	callbackqueueName string
@@ -76,7 +76,7 @@ func (c *NatsClient) Done() (err error) {
 	for key, clinetCallInfo := range c.callinfos.Items() {
 		if clinetCallInfo != nil {
 			// 关闭管道
-			c.CloseFch(clinetCallInfo.(ClinetCallInfo).call)
+			c.CloseFch(clinetCallInfo.(ClientCallInfo).call)
 			// 从Map中删除
 			c.callinfos.Delete(key)
 		}
@@ -99,10 +99,10 @@ func (c *NatsClient) Call(callInfo *mqrpc.CallInfo, callback chan *rpcpb.ResultI
 	callInfo.RPCInfo.ReplyTo = c.callbackqueueName
 	correlation_id := callInfo.RPCInfo.Cid
 
-	clinetCallInfo := &ClinetCallInfo{
-		correlation_id: correlation_id,
-		call:           callback,
-		timeout:        callInfo.RPCInfo.Expired,
+	clinetCallInfo := &ClientCallInfo{
+		correlationId: correlation_id,
+		call:          callback,
+		timeout:       callInfo.RPCInfo.Expired,
 	}
 	c.callinfos.Set(correlation_id, *clinetCallInfo)
 	body, err := c.Marshal(callInfo.RPCInfo)
@@ -193,9 +193,9 @@ func (c *NatsClient) on_request_handle() (err error) {
 			// 删除
 			c.callinfos.Delete(correlation_id)
 			if clinetCallInfo != nil {
-				if clinetCallInfo.(ClinetCallInfo).call != nil {
-					clinetCallInfo.(ClinetCallInfo).call <- resultInfo
-					c.CloseFch(clinetCallInfo.(ClinetCallInfo).call)
+				if clinetCallInfo.(ClientCallInfo).call != nil {
+					clinetCallInfo.(ClientCallInfo).call <- resultInfo
+					c.CloseFch(clinetCallInfo.(ClientCallInfo).call)
 				}
 			} else {
 				// 可能客户端已超时了，但服务端处理完还给回调了
@@ -226,14 +226,12 @@ func (c *NatsClient) Unmarshal(data []byte) (*rpcpb.RPCInfo, error) {
 	err := proto.Unmarshal(data, &rpcInfo)
 	if err != nil {
 		return nil, err
-	} else {
-		return &rpcInfo, err
 	}
 
-	panic("bug")
+	return &rpcInfo, err
 }
 
-// goroutine safe
+// Marshal goroutine safe
 func (c *NatsClient) Marshal(rpcInfo *rpcpb.RPCInfo) ([]byte, error) {
 	// map2:= structs.Map(callInfo)
 	b, err := proto.Marshal(rpcInfo)

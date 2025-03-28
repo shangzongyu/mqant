@@ -84,17 +84,17 @@ func (tcpConn *TCPConn) Write(b []byte) (n int, err error) {
 	return tcpConn.conn.Write(b)
 }
 
-// Read read data
+// Read data
 func (tcpConn *TCPConn) Read(b []byte) (int, error) {
 	return tcpConn.conn.Read(b)
 }
 
-// LocalAddr 本地socket端口地址
+// LocalAddr 本地 socket 端口地址
 func (tcpConn *TCPConn) LocalAddr() net.Addr {
 	return tcpConn.conn.LocalAddr()
 }
 
-// RemoteAddr 远程socket端口地址
+// RemoteAddr 远程 socket 端口地址
 func (tcpConn *TCPConn) RemoteAddr() net.Addr {
 	return tcpConn.conn.RemoteAddr()
 }

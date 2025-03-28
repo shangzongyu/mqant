@@ -7,7 +7,7 @@ import (
 
 	httpgatewayapi "github.com/shangzongyu/mqant/httpgateway/api"
 	"github.com/shangzongyu/mqant/httpgateway/errors"
-	go_api "github.com/shangzongyu/mqant/httpgateway/proto"
+	goapi "github.com/shangzongyu/mqant/httpgateway/proto"
 	"github.com/shangzongyu/mqant/module"
 	mqrpc "github.com/shangzongyu/mqant/rpc"
 )
@@ -36,7 +36,7 @@ func (a *APIHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(er.Error()))
 		return
 	}
-	rsp := &go_api.Response{}
+	rsp := &goapi.Response{}
 	ctx, _ := context.WithTimeout(context.TODO(), a.Opts.TimeOut)
 	if err = mqrpc.Proto(rsp, func() (reply interface{}, errstr interface{}) {
 		return server.SrvSession.Call(ctx, server.Hander, request)

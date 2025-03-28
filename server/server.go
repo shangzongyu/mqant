@@ -42,7 +42,7 @@ type Request interface {
 	Method() string
 	ContentType() string
 	Request() interface{}
-	// indicates whether the request will be streamed
+	// Stream indicates whether the request will be streamed
 	Stream() bool
 }
 

@@ -87,20 +87,20 @@ func Float64ToBytes(float float64) []byte {
 	return bytes
 }
 
-// BytesToFloat64 BytesToFloat64
+// BytesToFloat64 convert bytes to Float64
 func BytesToFloat64(bytes []byte) float64 {
 	bits := binary.LittleEndian.Uint64(bytes)
 
 	return math.Float64frombits(bits)
 }
 
-// MapToBytes MapToBytes
+// MapToBytes convert map to bytes
 func MapToBytes(jmap map[string]interface{}) ([]byte, error) {
 	bytes, err := json.Marshal(jmap)
 	return bytes, err
 }
 
-// BytesToMap BytesToMap
+// BytesToMap convert bytes to map
 func BytesToMap(bytes []byte) (map[string]interface{}, error) {
 	v := make(map[string]interface{})
 	err := json.Unmarshal(bytes, &v)
@@ -108,13 +108,13 @@ func BytesToMap(bytes []byte) (map[string]interface{}, error) {
 	return v, err
 }
 
-// MapToBytesString MapToBytesString
+// MapToBytesString convert map ot bytes string
 func MapToBytesString(jmap map[string]string) ([]byte, error) {
 	bytes, err := json.Marshal(jmap)
 	return bytes, err
 }
 
-// BytesToMapString BytesToMapString
+// BytesToMapString convert bytes to map string
 func BytesToMapString(bytes []byte) (map[string]string, error) {
 	v := make(map[string]string)
 	err := json.Unmarshal(bytes, &v)

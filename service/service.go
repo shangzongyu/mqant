@@ -8,7 +8,7 @@ import (
 	"github.com/shangzongyu/mqant/server"
 )
 
-// NewService NewService
+// NewService new service
 func NewService(opts ...Option) Service {
 	return newService(opts...)
 }
@@ -48,7 +48,7 @@ func (s *service) run(exit chan bool) {
 	}
 }
 
-// Init initialises options. Additionally it calls cmd.Init
+// Init initialises options. additionally it calls cmd.Init
 // which parses command line flags. cmd.Init is only called
 // on first Init.
 func (s *service) Init(opts ...Option) {

@@ -72,10 +72,10 @@ type URIRoute struct {
 
 // OnRoute OnRoute
 func (u *URIRoute) OnRoute(session gate.Session, topic string, msg []byte) (bool, interface{}, error) {
-	needreturn := true
+	needReturn := true
 	uu, err := url.Parse(topic)
 	if err != nil {
-		return needreturn, nil, errors.Errorf("topic is not uri %v", err.Error())
+		return needReturn, nil, errors.Errorf("topic is not uri %v", err.Error())
 	}
 	var ArgsType []string = nil
 	var args [][]byte = nil
@@ -83,10 +83,10 @@ func (u *URIRoute) OnRoute(session gate.Session, topic string, msg []byte) (bool
 	_func := uu.Path
 	m, err := url.ParseQuery(uu.RawQuery)
 	if err != nil {
-		return needreturn, nil, errors.Errorf("parse query error %v", err.Error())
+		return needReturn, nil, errors.Errorf("parse query error %v", err.Error())
 	}
 	if _, ok := m["msg_id"]; !ok {
-		needreturn = false
+		needReturn = false
 	}
 	ArgsType = make([]string, 2)
 	args = make([][]byte, 2)
@@ -95,7 +95,7 @@ func (u *URIRoute) OnRoute(session gate.Session, topic string, msg []byte) (bool
 	if u.Selector != nil {
 		ss, err := u.Selector(session, topic, uu)
 		if err != nil {
-			return needreturn, nil, err
+			return needReturn, nil, err
 		}
 		serverSession = ss
 	} else {
@@ -112,7 +112,7 @@ func (u *URIRoute) OnRoute(session gate.Session, topic string, msg []byte) (bool
 		}
 		ss, err := u.module.GetRouteServer(moduleType)
 		if err != nil {
-			return needreturn, nil, errors.Errorf("Service(type:%s) not found", moduleType)
+			return needReturn, nil, errors.Errorf("Service(type:%s) not found", moduleType)
 		}
 		serverSession = ss
 	}
@@ -120,22 +120,22 @@ func (u *URIRoute) OnRoute(session gate.Session, topic string, msg []byte) (bool
 	if u.DataParsing != nil {
 		bean, err := u.DataParsing(topic, uu, msg)
 		if err == nil && bean != nil {
-			if needreturn {
+			if needReturn {
 				ctx, _ := context.WithTimeout(context.TODO(), u.CallTimeOut)
 				result, e := serverSession.Call(ctx, _func, session, bean)
 				if e != "" {
-					return needreturn, result, errors.New(e)
+					return needReturn, result, errors.New(e)
 				}
-				return needreturn, result, nil
+				return needReturn, result, nil
 			}
 
 			e := serverSession.CallNR(_func, session, bean)
 			if e != nil {
 				log.Warning("Gate rpc", e.Error())
-				return needreturn, nil, e
+				return needReturn, nil, e
 			}
 
-			return needreturn, nil, nil
+			return needReturn, nil, nil
 		}
 	}
 
@@ -145,7 +145,7 @@ func (u *URIRoute) OnRoute(session gate.Session, topic string, msg []byte) (bool
 		var obj interface{} // var obj map[string]interface{}
 		err := json.Unmarshal(msg, &obj)
 		if err != nil {
-			return needreturn, nil, errors.Errorf("The JSON format is incorrect %v", err)
+			return needReturn, nil, errors.Errorf("The JSON format is incorrect %v", err)
 		}
 		ArgsType[1] = argsutil.MAP
 		args[1] = msg
@@ -155,33 +155,33 @@ func (u *URIRoute) OnRoute(session gate.Session, topic string, msg []byte) (bool
 	}
 	s := session.Clone()
 	s.SetTopic(topic)
-	if needreturn {
+	if needReturn {
 		ArgsType[0] = gate.RPCParamSessionType
 		b, err := s.Serializable()
 		if err != nil {
-			return needreturn, nil, err
+			return needReturn, nil, err
 		}
 		args[0] = b
 		ctx, _ := context.WithTimeout(context.TODO(), u.CallTimeOut)
 		result, e := serverSession.CallArgs(ctx, _func, ArgsType, args)
 		if e != "" {
-			return needreturn, result, errors.New(e)
+			return needReturn, result, errors.New(e)
 		}
-		return needreturn, result, nil
+		return needReturn, result, nil
 	}
 
 	ArgsType[0] = gate.RPCParamSessionType
 	b, err := s.Serializable()
 	if err != nil {
-		return needreturn, nil, err
+		return needReturn, nil, err
 	}
 	args[0] = b
 
 	e := serverSession.CallNRArgs(_func, ArgsType, args)
 	if e != nil {
 		log.Warning("Gate rpc", e.Error())
-		return needreturn, nil, e
+		return needReturn, nil, e
 	}
 
-	return needreturn, nil, nil
+	return needReturn, nil, nil
 }

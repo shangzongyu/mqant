@@ -16,15 +16,17 @@
 package basegate
 
 import (
+	"errors"
 	"fmt"
 	"runtime"
 	"strings"
 	"sync"
 
-	"github.com/pkg/errors"
 	"github.com/shangzongyu/mqant/gate"
 	"github.com/shangzongyu/mqant/log"
 )
+
+var errorNoSessionFound = errors.New("no session found")
 
 type handler struct {
 	// gate.AgentLearner
@@ -43,7 +45,7 @@ func NewGateHandler(gate gate.Gate) *handler {
 	return handler
 }
 
-// 当连接建立  并且MQTT协议握手成功
+// Connect 当连接建立  并且MQTT协议握手成功
 func (h *handler) Connect(a gate.Agent) {
 	defer func() {
 		if err := recover(); err != nil {
@@ -68,7 +70,7 @@ func (h *handler) Connect(a gate.Agent) {
 	}
 }
 
-// 当连接关闭	或者客户端主动发送MQTT DisConnect命令
+// DisConnect 当连接关闭	或者客户端主动发送MQTT DisConnect命令
 func (h *handler) DisConnect(a gate.Agent) {
 	defer func() {
 		if err := recover(); err != nil {
@@ -110,77 +112,69 @@ func (h *handler) GetAgentNum() int {
 	return num
 }
 
-/**
- *更新整个Session 通常是其他模块拉取最新数据
- */
-func (h *handler) GetAgent(Sessionid string) (gate.Agent, error) {
-	agent, ok := h.sessions.Load(Sessionid)
-	if !ok || agent == nil {
-		return nil, errors.New("No Sesssion found")
+// GetAgent 更新整个Session 通常是其他模块拉取最新数据
+func (h *handler) GetAgent(SessionId string) (gate.Agent, error) {
+	agentById, ok := h.sessions.Load(SessionId)
+	if !ok || agentById == nil {
+		return nil, errorNoSessionFound
 	}
-	return agent.(gate.Agent), nil
+	return agentById.(gate.Agent), nil
 }
 
-/**
- *更新整个Session 通常是其他模块拉取最新数据
- */
-func (h *handler) Update(span log.TraceSpan, Sessionid string) (result gate.Session, err string) {
-	agent, ok := h.sessions.Load(Sessionid)
-	if !ok || agent == nil {
-		err = "No Sesssion found"
+// Update 更新整个Session 通常是其他模块拉取最新数据
+func (h *handler) Update(span log.TraceSpan, SessionId string) (result gate.Session, err string) {
+	agentById, ok := h.sessions.Load(SessionId)
+	if !ok || agentById == nil {
+		err = errorNoSessionFound.Error()
 		return
 	}
-	result = agent.(gate.Agent).GetSession()
+	result = agentById.(gate.Agent).GetSession()
 	return
 }
 
-/**
- *Bind the session with the the Userid.
- */
-func (h *handler) Bind(span log.TraceSpan, Sessionid string, Userid string) (result gate.Session, err string) {
-	agent, ok := h.sessions.Load(Sessionid)
-	if !ok || agent == nil {
-		err = "No Sesssion found"
+// Bind the session with  the Userid.
+func (h *handler) Bind(span log.TraceSpan, SessionId string, Userid string) (result gate.Session, err string) {
+	agentById, ok := h.sessions.Load(SessionId)
+	if !ok || agentById == nil {
+		err = errorNoSessionFound.Error()
 		return
 	}
-	agent.(gate.Agent).GetSession().SetUserID(Userid)
+	agentById.(gate.Agent).GetSession().SetUserID(Userid)
 
-	if h.gate.GetStorageHandler() != nil && agent.(gate.Agent).GetSession().GetUserID() != "" {
+	if h.gate.GetStorageHandler() != nil && agentById.(gate.Agent).GetSession().GetUserID() != "" {
 		// 可以持久化
 		data, err := h.gate.GetStorageHandler().Query(Userid)
 		if err == nil && data != nil {
 			// 有已持久化的数据,可能是上一次连接保存的
 			impSession, err := h.gate.NewSession(data)
 			if err == nil {
-				if agent.(gate.Agent).GetSession() == nil {
-					agent.(gate.Agent).GetSession().SetSettings(impSession.CloneSettings())
+				if agentById.(gate.Agent).GetSession() == nil {
+					agentById.(gate.Agent).GetSession().SetSettings(impSession.CloneSettings())
 				} else {
 					// 合并两个map 并且以 agent.(Agent).GetSession().Settings 已有的优先
 					settings := impSession.CloneSettings()
-					_ = agent.(gate.Agent).GetSession().ImportSettings(settings)
+					_ = agentById.(gate.Agent).GetSession().ImportSettings(settings)
 				}
 			} else {
 				// 解析持久化数据失败
-				log.Warning("Sesssion Resolve fail %s", err.Error())
+				log.Warning("sesssion Resolve fail %s", err.Error())
 			}
 		}
 		// 数据持久化
-		_ = h.gate.GetStorageHandler().Storage(agent.(gate.Agent).GetSession())
+		_ = h.gate.GetStorageHandler().Storage(agentById.(gate.Agent).GetSession())
 	}
 
-	result = agent.(gate.Agent).GetSession()
+	result = agentById.(gate.Agent).GetSession()
 	return
 }
 
-/**
- *查询某一个userId是否连接中，这里只是查询这一个网关里面是否有userId客户端连接，如果有多个网关就需要遍历了
- */
-func (h *handler) IsConnect(span log.TraceSpan, Sessionid string, Userid string) (bool, string) {
-	isconnect := false
+// IsConnect 查询某一个userId是否连接中，这里只是查询这一个网关里面是否有userId客户端连接，如果有多个网关就需要遍历了
+func (h *handler) IsConnect(span log.TraceSpan, sessionId string, Userid string) (bool, string) {
+	isConnect := false
 	found := false
 	h.sessions.Range(func(key, agent interface{}) bool {
 		if agent.(gate.Agent).GetSession().GetUserID() == Userid {
-			isconnect = !agent.(gate.Agent).IsClosed()
+			isConnect = !agent.(gate.Agent).IsClosed()
 			found = true
 			return false
 		}
@@ -189,39 +183,36 @@ func (h *handler) IsConnect(span log.TraceSpan, Sessionid string, Userid string)
 	if !found {
 		return false, fmt.Sprintf("The gateway did not find the corresponding userId 【%s】", Userid)
 	}
-	return isconnect, ""
+
+	return isConnect, ""
 }
 
-/**
- *UnBind the session with the the Userid.
- */
-func (h *handler) UnBind(span log.TraceSpan, Sessionid string) (result gate.Session, err string) {
-	agent, ok := h.sessions.Load(Sessionid)
-	if !ok || agent == nil {
-		err = "No Sesssion found"
+// UnBind the session with the Userid.
+func (h *handler) UnBind(span log.TraceSpan, sessionId string) (result gate.Session, err string) {
+	agentById, ok := h.sessions.Load(sessionId)
+	if !ok || agentById == nil {
+		err = errorNoSessionFound.Error()
 		return
 	}
-	agent.(gate.Agent).GetSession().SetUserID("")
-	result = agent.(gate.Agent).GetSession()
+	agentById.(gate.Agent).GetSession().SetUserID("")
+	result = agentById.(gate.Agent).GetSession()
 	return
 }
 
-/**
- *Push the session with the the Userid.
- */
-func (h *handler) Push(span log.TraceSpan, Sessionid string, Settings map[string]string) (result gate.Session, err string) {
-	agent, ok := h.sessions.Load(Sessionid)
-	if !ok || agent == nil {
-		err = "No Sesssion found"
+// Push the session with the Userid.
+func (h *handler) Push(span log.TraceSpan, SessionId string, Settings map[string]string) (result gate.Session, err string) {
+	agentById, ok := h.sessions.Load(SessionId)
+	if !ok || agentById == nil {
+		err = errorNoSessionFound.Error()
 		return
 	}
 	// 覆盖当前map对应的key-value
 	for key, value := range Settings {
-		_ = agent.(gate.Agent).GetSession().SetLocalKV(key, value)
+		_ = agentById.(gate.Agent).GetSession().SetLocalKV(key, value)
 	}
-	result = agent.(gate.Agent).GetSession()
-	if h.gate.GetStorageHandler() != nil && agent.(gate.Agent).GetSession().GetUserID() != "" {
-		err := h.gate.GetStorageHandler().Storage(agent.(gate.Agent).GetSession())
+	result = agentById.(gate.Agent).GetSession()
+	if h.gate.GetStorageHandler() != nil && agentById.(gate.Agent).GetSession().GetUserID() != "" {
+		err := h.gate.GetStorageHandler().Storage(agentById.(gate.Agent).GetSession())
 		if err != nil {
 			log.Warning("gate session storage failure : %s", err.Error())
 		}
@@ -230,20 +221,18 @@ func (h *handler) Push(span log.TraceSpan, Sessionid string, Settings map[string
 	return
 }
 
-/**
- *Set values (one or many) for the session.
- */
-func (h *handler) Set(span log.TraceSpan, Sessionid string, key string, value string) (result gate.Session, err string) {
-	agent, ok := h.sessions.Load(Sessionid)
-	if !ok || agent == nil {
-		err = "No Sesssion found"
+// Set values (one or many) for the session.
+func (h *handler) Set(span log.TraceSpan, sessionId, key, value string) (result gate.Session, err string) {
+	agentById, ok := h.sessions.Load(sessionId)
+	if !ok || agentById == nil {
+		err = errorNoSessionFound.Error()
 		return
 	}
-	_ = agent.(gate.Agent).GetSession().SetLocalKV(key, value)
-	result = agent.(gate.Agent).GetSession()
+	_ = agentById.(gate.Agent).GetSession().SetLocalKV(key, value)
+	result = agentById.(gate.Agent).GetSession()
 
-	if h.gate.GetStorageHandler() != nil && agent.(gate.Agent).GetSession().GetUserID() != "" {
-		err := h.gate.GetStorageHandler().Storage(agent.(gate.Agent).GetSession())
+	if h.gate.GetStorageHandler() != nil && agentById.(gate.Agent).GetSession().GetUserID() != "" {
+		err := h.gate.GetStorageHandler().Storage(agentById.(gate.Agent).GetSession())
 		if err != nil {
 			log.Error("gate session storage failure : %s", err.Error())
 		}
@@ -252,20 +241,18 @@ func (h *handler) Set(span log.TraceSpan, Sessionid string, key string, value st
 	return
 }
 
-/**
- *Remove value from the session.
- */
-func (h *handler) Remove(span log.TraceSpan, Sessionid string, key string) (result interface{}, err string) {
-	agent, ok := h.sessions.Load(Sessionid)
-	if !ok || agent == nil {
-		err = "No Sesssion found"
+// Remove value from the session.
+func (h *handler) Remove(span log.TraceSpan, SessionId string, key string) (result interface{}, err string) {
+	agentById, ok := h.sessions.Load(SessionId)
+	if !ok || agentById == nil {
+		err = errorNoSessionFound.Error()
 		return
 	}
-	_ = agent.(gate.Agent).GetSession().RemoveLocalKV(key)
-	result = agent.(gate.Agent).GetSession()
+	_ = agentById.(gate.Agent).GetSession().RemoveLocalKV(key)
+	result = agentById.(gate.Agent).GetSession()
 
-	if h.gate.GetStorageHandler() != nil && agent.(gate.Agent).GetSession().GetUserID() != "" {
-		err := h.gate.GetStorageHandler().Storage(agent.(gate.Agent).GetSession())
+	if h.gate.GetStorageHandler() != nil && agentById.(gate.Agent).GetSession().GetUserID() != "" {
+		err := h.gate.GetStorageHandler().Storage(agentById.(gate.Agent).GetSession())
 		if err != nil {
 			log.Error("gate session storage failure :%s", err.Error())
 		}
@@ -274,16 +261,14 @@ func (h *handler) Remove(span log.TraceSpan, Sessionid string, key string) (resu
 	return
 }
 
-/**
- *Send message to the session.
- */
-func (h *handler) Send(span log.TraceSpan, Sessionid string, topic string, body []byte) (result interface{}, err string) {
-	agent, ok := h.sessions.Load(Sessionid)
-	if !ok || agent == nil {
-		err = "No Sesssion found"
+// Send message to the session.
+func (h *handler) Send(span log.TraceSpan, SessionId string, topic string, body []byte) (result interface{}, err string) {
+	agentById, ok := h.sessions.Load(SessionId)
+	if !ok || agentById == nil {
+		err = errorNoSessionFound.Error()
 		return
 	}
-	e := agent.(gate.Agent).WriteMsg(topic, body)
+	e := agentById.(gate.Agent).WriteMsg(topic, body)
 	if e != nil {
 		err = e.Error()
 	} else {
@@ -292,18 +277,16 @@ func (h *handler) Send(span log.TraceSpan, Sessionid string, topic string, body 
 	return
 }
 
-/**
- *批量发送消息,sessionid之间用,分割
- */
-func (h *handler) SendBatch(span log.TraceSpan, SessionidStr string, topic string, body []byte) (int64, string) {
-	sessionids := strings.Split(SessionidStr, ",")
+// SendBatch 批量发送消息,sessionIdStr 之间用,分割
+func (h *handler) SendBatch(span log.TraceSpan, sessionIdStr string, topic string, body []byte) (int64, string) {
+	sessionIds := strings.Split(sessionIdStr, ",")
 	var count int64 = 0
-	for _, sessionid := range sessionids {
-		agent, ok := h.sessions.Load(sessionid)
-		if !ok || agent == nil {
+	for _, sessionId := range sessionIds {
+		agentById, ok := h.sessions.Load(sessionId)
+		if !ok || agentById == nil {
 			continue
 		}
-		e := agent.(gate.Agent).WriteMsg(topic, body)
+		e := agentById.(gate.Agent).WriteMsg(topic, body)
 		if e != nil {
 			log.Warning("WriteMsg error: %v", e.Error())
 		} else {
@@ -327,15 +310,13 @@ func (h *handler) BroadCast(span log.TraceSpan, topic string, body []byte) (int6
 	return count, ""
 }
 
-/**
- *主动关闭连接
- */
-func (h *handler) Close(span log.TraceSpan, Sessionid string) (result interface{}, err string) {
-	agent, ok := h.sessions.Load(Sessionid)
-	if !ok || agent == nil {
-		err = "No Sesssion found"
+// Close 主动关闭连接
+func (h *handler) Close(span log.TraceSpan, sessionId string) (result interface{}, err string) {
+	agentById, ok := h.sessions.Load(sessionId)
+	if !ok || agentById == nil {
+		err = errorNoSessionFound.Error()
 		return
 	}
-	agent.(gate.Agent).Close()
+	agentById.(gate.Agent).Close()
 	return
 }

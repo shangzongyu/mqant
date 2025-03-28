@@ -312,7 +312,7 @@ func (app *DefaultApp) Watcher(node *registry.Node) {
 	// 把注销的服务ServerSession删除掉
 	session, ok := app.serverList.Load(node.Id)
 	if ok && session != nil {
-		session.(module.ServerSession).GetRpc().Done()
+		session.(module.ServerSession).GetRPC().Done()
 		app.serverList.Delete(node.Id)
 	}
 }
@@ -354,12 +354,6 @@ func (app *DefaultApp) GetServerByID(serverID string) (module.ServerSession, err
 		return session.(module.ServerSession), nil
 	}
 	return nil, errors.Errorf("nofound %v", serverID)
-}
-
-// GetServerById 通过服务ID获取服务实例
-// Deprecated: 因为命名规范问题函数将废弃,请用GetServerById代替
-func (app *DefaultApp) GetServerById(serverID string) (module.ServerSession, error) {
-	return app.GetServerByID(serverID)
 }
 
 // GetServerBySelector 获取服务实例,可设置选择器
@@ -456,12 +450,6 @@ func (app *DefaultApp) Invoke(module module.RPCModule, moduleType string, _func 
 	return server.Call(nil, _func, params...)
 }
 
-// RpcInvoke RpcInvoke
-// Deprecated: 因为命名规范问题函数将废弃,请用Invoke代替
-func (app *DefaultApp) RpcInvoke(module module.RPCModule, moduleType string, _func string, params ...interface{}) (result interface{}, err string) {
-	return app.Invoke(module, moduleType, _func, params...)
-}
-
 // InvokeNR InvokeNR
 func (app *DefaultApp) InvokeNR(module module.RPCModule, moduleType string, _func string, params ...interface{}) (err error) {
 	server, err := app.GetRouteServer(moduleType)
@@ -470,29 +458,6 @@ func (app *DefaultApp) InvokeNR(module module.RPCModule, moduleType string, _fun
 	}
 	return server.CallNR(_func, params...)
 }
-
-// RpcInvokeNR RpcInvokeNR
-// Deprecated: 因为命名规范问题函数将废弃,请用InvokeNR代替
-func (app *DefaultApp) RpcInvokeNR(module module.RPCModule, moduleType string, _func string, params ...interface{}) (err error) {
-	return app.InvokeNR(module, moduleType, _func, params...)
-}
-
-//func (app *DefaultApp) RpcInvokeArgs(module module.RPCModule, moduleType string, _func string, ArgsType []string, args [][]byte) (result interface{}, err string) {
-//	server, e := app.GetRouteServer(moduleType)
-//	if e != nil {
-//		err = e.Error()
-//		return
-//	}
-//	return server.CallArgs(nil, _func, ArgsType, args)
-//}
-//
-//func (app *DefaultApp) RpcInvokeNRArgs(module module.RPCModule, moduleType string, _func string, ArgsType []string, args [][]byte) (err error) {
-//	server, err := app.GetRouteServer(moduleType)
-//	if err != nil {
-//		return
-//	}
-//	return server.CallNRArgs(_func, ArgsType, args)
-//}
 
 // Call Call
 func (app *DefaultApp) Call(ctx context.Context, moduleType, _func string, param mqrpc.ParamOption, opts ...selector.SelectOption) (result interface{}, errstr string) {
@@ -504,13 +469,7 @@ func (app *DefaultApp) Call(ctx context.Context, moduleType, _func string, param
 	return server.Call(ctx, _func, param()...)
 }
 
-// RpcCall RpcCall
-// Deprecated: 因为命名规范问题函数将废弃,请用Call代替
-func (app *DefaultApp) RpcCall(ctx context.Context, moduleType, _func string, param mqrpc.ParamOption, opts ...selector.SelectOption) (result interface{}, errstr string) {
-	return app.Call(ctx, moduleType, _func, param, opts...)
-}
-
-// GetModuleInited GetModuleInited
+// GetModuleInited get module inited
 func (app *DefaultApp) GetModuleInited() func(app module.App, module module.Module) {
 	return app.moduleInited
 }

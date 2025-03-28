@@ -8,7 +8,7 @@ import (
 	"github.com/shangzongyu/mqant/server"
 )
 
-// Service Service
+// Service mqant service
 type Service interface {
 	Init(...Option)
 	Options() Options
@@ -17,7 +17,7 @@ type Service interface {
 	String() string
 }
 
-// Option Option
+// Option mqant option
 type Option func(*Options)
 
 // Options Options
@@ -88,28 +88,36 @@ func Registry(r registry.Registry) Option {
 // Name of the service
 func Name(n string) Option {
 	return func(o *Options) {
-		o.Server.Init(server.Name(n))
+		if err := o.Server.Init(server.Name(n)); err != nil {
+			panic(err)
+		}
 	}
 }
 
 // Version of the service
 func Version(v string) Option {
 	return func(o *Options) {
-		o.Server.Init(server.Version(v))
+		if err := o.Server.Init(server.Version(v)); err != nil {
+			panic(err)
+		}
 	}
 }
 
 // Metadata associated with the service
 func Metadata(md map[string]string) Option {
 	return func(o *Options) {
-		o.Server.Init(server.Metadata(md))
+		if err := o.Server.Init(server.Metadata(md)); err != nil {
+			panic(err)
+		}
 	}
 }
 
 // RegisterTTL specifies the TTL to use when registering the service
 func RegisterTTL(t time.Duration) Option {
 	return func(o *Options) {
-		o.Server.Init(server.RegisterTTL(t))
+		if err := o.Server.Init(server.RegisterTTL(t)); err != nil {
+			panic(err)
+		}
 	}
 }
 

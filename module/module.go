@@ -32,12 +32,8 @@ type ProtocolMarshal interface {
 
 // ServerSession 服务代理
 type ServerSession interface {
-	// Deprecated: 因为命名规范问题函数将废弃,请用GetID代替
-	GetId() string
 	GetID() string
 	GetName() string
-	GetRpc() mqrpc.RPCClient
-	// Deprecated: 因为命名规范问题函数将废弃,请用GetRPC代替
 	GetRPC() mqrpc.RPCClient
 	GetApp() App
 	GetNode() *registry.Node
@@ -48,7 +44,7 @@ type ServerSession interface {
 	CallNRArgs(_func string, ArgsType []string, args [][]byte) (err error)
 }
 
-// App mqant应用定义
+// App mqant 应用定义
 type App interface {
 	UpdateOptions(opts ...Option) error
 	Run(mods ...Module) error
@@ -59,46 +55,27 @@ type App interface {
 	Options() Options
 	Transport() *nats.Conn
 	Registry() registry.Registry
-	// Deprecated: 因为命名规范问题函数将废弃,请用GetServerByID代替
-	GetServerById(id string) (ServerSession, error)
 	GetServerByID(id string) (ServerSession, error)
 	/**
-	filter		 调用者服务类型    moduleType|moduleType@moduleID
-	Type	   	想要调用的服务类型
+	  filter		 调用者服务类型    moduleType|moduleType@moduleID
+	  Type	   	想要调用的服务类型
 	*/
 	GetRouteServer(filter string, opts ...selector.SelectOption) (ServerSession, error) // 获取经过筛选过的服务
 	GetServersByType(Type string) []ServerSession
 	GetSettings() conf.Config // 获取配置信息
-
-	// Deprecated: 因为命名规范问题函数将废弃,请用Invoke代替
-	RpcInvoke(module RPCModule, moduleType string, _func string, params ...interface{}) (interface{}, string)
-	// Deprecated: 因为命名规范问题函数将废弃,请用InvokeNR代替
-	RpcInvokeNR(module RPCModule, moduleType string, _func string, params ...interface{}) error
-	// Deprecated: 因为命名规范问题函数将废弃,请用Call代替
-	RpcCall(ctx context.Context, moduleType, _func string, param mqrpc.ParamOption, opts ...selector.SelectOption) (interface{}, string)
-
 	Invoke(module RPCModule, moduleType string, _func string, params ...interface{}) (interface{}, string)
 	InvokeNR(module RPCModule, moduleType string, _func string, params ...interface{}) error
 	Call(ctx context.Context, moduleType, _func string, param mqrpc.ParamOption, opts ...selector.SelectOption) (interface{}, string)
 
-	/**
-	添加一个 自定义参数序列化接口
-	gate,system 关键词一被占用请使用其他名称
-	*/
+	// AddRPCSerialize  添加一个 自定义参数序列化接口  gate,system 关键词一被占用请使用其他名称
 	AddRPCSerialize(name string, Interface RPCSerialize) error
-
 	GetRPCSerialize() map[string]RPCSerialize
-
 	GetModuleInited() func(app App, module Module)
-
 	OnConfigurationLoaded(func(app App)) error
 	OnModuleInited(func(app App, module Module)) error
 	OnStartup(func(app App)) error
-
 	SetProtocolMarshal(protocolMarshal func(Trace string, Result interface{}, Error string) (ProtocolMarshal, string)) error
-	/**
-	与客户端通信的协议包接口
-	*/
+	// ProtocolMarshal 与客户端通信的协议包接口
 	ProtocolMarshal(Trace string, Result interface{}, Error string) (ProtocolMarshal, string)
 	NewProtocolMarshal(data []byte) ProtocolMarshal
 	GetProcessID() string
@@ -148,8 +125,8 @@ type RPCModule interface {
 	Call(ctx context.Context, moduleType, _func string, param mqrpc.ParamOption, opts ...selector.SelectOption) (interface{}, string)
 	GetModuleSettings() (settings *conf.ModuleSettings)
 	/**
-	filter		 调用者服务类型    moduleType|moduleType@moduleID
-	Type	   	想要调用的服务类型
+	  filter		 调用者服务类型    moduleType|moduleType@moduleID
+	  Type	   	想要调用的服务类型
 	*/
 	GetRouteServer(filter string, opts ...selector.SelectOption) (ServerSession, error)
 	GetExecuting() int64
@@ -158,23 +135,21 @@ type RPCModule interface {
 // RPCSerialize 自定义参数序列化接口
 type RPCSerialize interface {
 	/**
-	序列化 结构体-->[]byte
-	param 需要序列化的参数值
-	@return ptype 当能够序列化这个值,并且正确解析为[]byte时 返回改值正确的类型,否则返回 ""即可
-	@return p 解析成功得到的数据, 如果无法解析该类型,或者解析失败 返回nil即可
-	@return err 无法解析该类型,或者解析失败 返回错误信息
+	  序列化 结构体-->[]byte
+	  param 需要序列化的参数值
+	  @return ptype 当能够序列化这个值,并且正确解析为[]byte时 返回改值正确的类型,否则返回 ""即可
+	  @return p 解析成功得到的数据, 如果无法解析该类型,或者解析失败 返回nil即可
+	  @return err 无法解析该类型,或者解析失败 返回错误信息
 	*/
 	Serialize(param interface{}) (ptype string, p []byte, err error)
 	/**
-	反序列化 []byte-->结构体
-	ptype 参数类型 与Serialize函数中ptype 对应
-	b   参数的字节流
-	@return param 解析成功得到的数据结构
-	@return err 无法解析该类型,或者解析失败 返回错误信息
+	  Deserialize 反序列化 []byte-->结构体
+	  ptype 参数类型 与Serialize函数中ptype 对应
+	  b   参数的字节流
+	  @return param 解析成功得到的数据结构
+	  @return err 无法解析该类型,或者解析失败 返回错误信息
 	*/
 	Deserialize(ptype string, b []byte) (param interface{}, err error)
-	/**
-	返回这个接口能够处理的所有类型
-	*/
+	// GetTypes  返回这个接口能够处理的所有类型
 	GetTypes() []string
 }

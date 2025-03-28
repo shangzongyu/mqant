@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 package uuid
 
 import (
@@ -21,11 +22,7 @@ import (
 	mrand "math/rand"
 	"regexp"
 	"strings"
-	"time"
 )
-
-// seeded indicates if math/rand has been seeded
-var seeded bool = false
 
 // uuidRegex matches the UUID string
 var uuidRegex *regexp.Regexp = regexp.MustCompile(`^\{?([a-fA-F0-9]{8})-?([a-fA-F0-9]{4})-?([a-fA-F0-9]{4})-?([a-fA-F0-9]{4})-?([a-fA-F0-9]{12})\}?$`)
@@ -34,8 +31,8 @@ var uuidRegex *regexp.Regexp = regexp.MustCompile(`^\{?([a-fA-F0-9]{8})-?([a-fA-
 type UUID [16]byte
 
 // Hex returns a hex string representation of the UUID in xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx format.
-func (this UUID) Hex() string {
-	x := [16]byte(this)
+func (u UUID) Hex() string {
+	x := [16]byte(u)
 	return fmt.Sprintf("%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x",
 		x[0], x[1], x[2], x[3], x[4],
 		x[5], x[6],
@@ -65,13 +62,13 @@ func Rand() UUID {
 // If the string is not in one of these formats, it'll return an error.
 func FromStr(s string) (id UUID, err error) {
 	if s == "" {
-		err = errors.New("Empty string")
+		err = errors.New("empty string")
 		return
 	}
 
 	parts := uuidRegex.FindStringSubmatch(s)
 	if parts == nil {
-		err = errors.New("Invalid string format")
+		err = errors.New("invalid string format")
 		return
 	}
 
@@ -94,15 +91,10 @@ func MustFromStr(s string) UUID {
 
 // randBytes uses crypto random to get random numbers. If fails then it uses math random.
 func randBytes(x []byte) {
-
 	length := len(x)
 	n, err := crand.Read(x)
 
 	if n != length || err != nil {
-		if !seeded {
-			mrand.Seed(time.Now().UnixNano())
-		}
-
 		for length > 0 {
 			length--
 			x[length] = byte(mrand.Int31n(256))

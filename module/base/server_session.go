@@ -50,11 +50,6 @@ func (c *serverSession) GetID() string {
 	return c.node.Id
 }
 
-// Deprecated: 因为命名规范问题函数将废弃,请用GetID代替
-func (c *serverSession) GetId() string {
-	return c.node.Id
-}
-
 func (c *serverSession) GetName() string {
 	return c.name
 }

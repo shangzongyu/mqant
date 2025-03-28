@@ -24,7 +24,7 @@ type Selector interface {
 	Reset(service string)
 	// Close renders the selector unusable
 	Close() error
-	// Name of the selector
+	// String name of the selector
 	String() string
 }
 

@@ -2,6 +2,7 @@
 package cache
 
 import (
+	"errors"
 	"sync"
 	"time"
 
@@ -127,7 +128,7 @@ func (c *cacheSelector) get(service string) ([]*registry.Service, error) {
 	}
 
 	// not found error then return
-	if err == registry.ErrNotFound {
+	if errors.Is(err, registry.ErrNotFound) {
 		return nil, selector.ErrNotFound
 	}
 

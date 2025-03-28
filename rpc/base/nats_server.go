@@ -14,6 +14,7 @@
 package defaultrpc
 
 import (
+	"errors"
 	"fmt"
 	"runtime"
 	"strings"
@@ -64,7 +65,7 @@ func NewNatsServer(app module.App, s *RPCServer) (*NatsServer, error) {
 	server.app = app
 	server.addr = nats.NewInbox()
 	go func() {
-		server.on_request_handle()
+		server.onRequestHandle()
 		safeClose(server.stopeds)
 	}()
 	return server, nil
@@ -98,20 +99,17 @@ func (s *NatsServer) Shutdown() (err error) {
 	return
 }
 
-func (s *NatsServer) Callback(callinfo *mqrpc.CallInfo) error {
-	body, err := s.MarshalResult(callinfo.Result)
+func (s *NatsServer) Callback(callInfo *mqrpc.CallInfo) error {
+	body, err := s.MarshalResult(callInfo.Result)
 	if err != nil {
 		return err
 	}
-	reply_to := callinfo.Props["reply_to"].(string)
-	return s.app.Transport().Publish(reply_to, body)
+	replyTo := callInfo.Props["reply_to"].(string)
+	return s.app.Transport().Publish(replyTo, body)
 }
 
-/*
-*
-接收请求信息
-*/
-func (s *NatsServer) on_request_handle() (err error) {
+// onRequestHandle接收请求信息
+func (s *NatsServer) onRequestHandle() (err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			rn := ""
@@ -144,7 +142,7 @@ func (s *NatsServer) on_request_handle() (err error) {
 
 	for !s.isClose {
 		m, err := s.subs.NextMsg(time.Minute)
-		if err != nil && err == nats.ErrTimeout {
+		if err != nil && errors.Is(err, nats.ErrTimeout) {
 			// fmt.Println(err.Error())
 			// log.Warning("NatsServer error with '%v'",err)
 			if !s.subs.IsValid() {
@@ -202,7 +200,7 @@ func (s *NatsServer) Unmarshal(data []byte) (*rpcpb.RPCInfo, error) {
 	panic("bug")
 }
 
-// goroutine safe
+// MarshalResult goroutine safe
 func (s *NatsServer) MarshalResult(resultInfo *rpcpb.ResultInfo) ([]byte, error) {
 	// log.Error("",map2)
 	b, err := proto.Marshal(resultInfo)

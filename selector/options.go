@@ -17,7 +17,7 @@ type Options struct {
 	Context context.Context
 }
 
-// SelectOptions SelectOptions
+// SelectOptions select options
 type SelectOptions struct {
 	Filters  []Filter
 	Strategy Strategy

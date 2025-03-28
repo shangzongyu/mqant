@@ -55,7 +55,7 @@ type Config struct {
 	Settings map[string]interface{}
 }
 
-// rpc 进程间通信配置
+// RPC 进程间通信配置
 type RPC struct {
 	MaxCoroutine int  //模块同时可以创建的最大协程数量默认是100
 	RPCExpired   int  `json:"RpcExpired"` //远程访问最后期限值 单位秒[默认5秒] 这个值指定了在客户端可以等待服务端多长时间来应答
